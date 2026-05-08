@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="熊猫家政">
+<title>熊猫家政 · 阿姨端</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif}
+
+/* ===== App容器 ===== */
+#app{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden}
+
+/* ===== 页面切换 ===== */
+.page{display:none;flex-direction:column;flex:1;overflow-y:auto}
+.page.active{display:flex}
+
+/* ===== 状态栏 ===== */
+.sb{height:44px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;flex-shrink:0}
+.sbc{width:100%;display:flex;justify-content:space-between;padding:0 20px;font-size:12px;font-weight:600;color:#fff}
+.sbc.dark{color:#333}
+
+/* ===== TabBar ===== */
+.tabbar{background:#fff;display:flex;justify-content:space-around;padding:8px 0 env(safe-area-inset-bottom,16px);border-top:1px solid #f0f0f0;flex-shrink:0}
+.tab-item{display:flex;flex-direction:column;align-items:center;color:#999;font-size:10px;gap:2px;cursor:pointer;padding:4px 12px;position:relative;transition:color .2s;min-width:50px}
+.tab-item.act{color:#07c160}
+.tab-ic{font-size:22px;line-height:1}
+
+/* ===== Toast ===== */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:14px 28px;border-radius:12px;font-size:14px;z-index:9999;animation:toastFade 2.2s forwards;pointer-events:none;white-space:nowrap}
+@keyframes toastFade{0%{opacity:0;transform:translate(-50%,-50%) scale(.9)}15%{opacity:1;transform:translate(-50%,-50%) scale(1)}85%{opacity:1}100%{opacity:0}}
+
+/* ===== 确认弹窗 ===== */
+.confirm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center}
+.confirm-overlay.show{display:flex}
+.confirm-box{background:#fff;border-radius:20px;padding:24px;width:min(300px,85vw);text-align:center;animation:popIn .25s}
+@keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.confirm-box .cicon{font-size:44px;margin-bottom:12px}
+.confirm-box h3{font-size:17px;color:#333;margin-bottom:8px}
+.confirm-box p{font-size:13px;color:#666;line-height:1.5;margin-bottom:20px}
+.confirm-actions{display:flex;gap:10px}
+.confirm-actions button{flex:1;padding:12px;border-radius:10px;border:none;font-size:14px;font-weight:500;cursor:pointer}
+.confirm-cancel{background:#f5f5f5;color:#666}
+.confirm-ok{background:#07c160;color:#fff}
+
+/* ===== 骨架屏 ===== */
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:800px 100%;animation:shimmer 1.5s infinite;border-radius:8px}
+
+/* ============================================================
+   首页
+   ============================================================ */
+#page-home .home-hd{background:linear-gradient(135deg,#07c160,#10b980);padding:16px 20px 24px}
+#page-home .home-hdt{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+#page-home .home-hdt h2{color:#fff;font-size:20px;font-weight:600}
+.hd-icons{display:flex;gap:14px}
+.hd-icon{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;position:relative;cursor:pointer}
+.hd-icon .dot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:2px solid #07c160}
+.ai-card{background:rgba(255,255,255,.15);backdrop-filter:blur(10px);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.ai-card:active{transform:scale(.98)}
+.ai-av{width:48px;height:48px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.ai-info h3{color:#fff;font-size:15px;margin-bottom:2px}
+.ai-info p{color:rgba(255,255,255,.8);font-size:12px}
+.ai-ar{color:rgba(255,255,255,.6);font-size:22px}
+
+.home-body{background:#f5f5f5;padding-bottom:80px}
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 16px 12px}
+.cat-item{text-align:center;padding:12px 4px;background:#fff;border-radius:16px;cursor:pointer;transition:transform .2s;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.cat-item:active{transform:scale(.94)}
+.cat-item.act{background:#eef2ff;border:2px solid #4f46e5;box-shadow:0 0 0 4px rgba(79,70,229,.1)}
+.cat-ic{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px}
+.cat-ic.g{background:#d1fae5}.cat-ic.b{background:#dbeafe}.cat-ic.p{background:#ede9fe}.cat-ic.o{background:#ffedd5}
+.cat-lb{font-size:12px;color:#333;font-weight:500}
+
+.sec-t{display:flex;justify-content:space-between;align-items:center;padding:0 16px;margin-bottom:12px}
+.sec-t h3{font-size:16px;font-weight:600;color:#333}
+.sec-t span{font-size:12px;color:#07c160;cursor:pointer}
+
+.job-c{background:#fff;margin:0 16px 12px;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer;transition:transform .2s;position:relative}
+.job-c:active{transform:scale(.98)}
+.job-ch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.job-t{font-size:15px;font-weight:600;color:#333;flex:1;padding-right:8px}
+.job-s{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#d97706;font-size:14px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.job-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.job-tg{font-size:11px;padding:4px 10px;border-radius:12px;background:#f0fdf4;color:#07c160}
+.job-tg.b{background:#eff6ff;color:#3b82f6}.job-tg.p{background:#faf5ff;color:#8b5cf6}.job-tg.o{background:#fff7ed;color:#f97316}
+.job-f{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #f0f0f0}
+.job-co{font-size:12px;color:#999}
+.job-d{font-size:11px;color:#07c160;background:#f0fdf4;padding:4px 8px;border-radius:8px}
+.match-badge{position:absolute;top:-8px;right:12px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-size:9px;padding:4px 8px;border-radius:10px;font-weight:600}
+
+/* ===== 岗位详情弹窗 ===== */
+.job-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:500;display:none}
+.job-modal-overlay.show{display:block}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;max-height:88vh;overflow-y:auto;animation:slideUp .3s;padding-bottom:env(safe-area-inset-bottom,16px)}
+.modal-handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:12px auto 4px}
+.modal-close{position:absolute;top:12px;right:16px;width:32px;height:32px;border-radius:50%;background:#f5f5f5;border:none;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.detail-header{padding:16px 20px;border-bottom:1px solid #f0f0f0}
+.detail-header h2{font-size:17px;font-weight:600;color:#333;margin-bottom:6px}
+.detail-header .salary{color:#d97706;font-size:20px;font-weight:700}
+.detail-header .pub-time{font-size:12px;color:#999;margin-top:4px}
+.detail-body{padding:16px 20px}
+.detail-section{margin-bottom:20px}
+.detail-section h4{font-size:14px;font-weight:600;color:#333;margin-bottom:10px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.detail-item{background:#f9f9f9;border-radius:10px;padding:12px}
+.detail-item .l{font-size:11px;color:#999;margin-bottom:4px}
+.detail-item .v{font-size:14px;font-weight:500;color:#333}
+.detail-desc{font-size:14px;color:#666;line-height:1.7}
+.detail-footer{padding:14px 20px;background:#fff;border-top:1px solid #f0f0f0;display:flex;gap:12px}
+.detail-footer button{flex:1;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:transform .2s}
+.detail-footer button:active{transform:scale(.97)}
+.btn-primary{background:#07c160;color:#fff}
+.btn-secondary{background:#f5f5f5;color:#666}
+
+/* ============================================================
+   应聘管理
+   ============================================================ */
+#page-apply .page-hd{background:#fff;padding:12px 20px 12px;border-bottom:1px solid #f0f0f0;flex-shrink:0;padding-top:calc(12px + env(safe-area-inset-top,0px))}
+#page-apply .page-hd h2{font-size:18px;font-weight:600;color:#333}
+.filter-bar{display:flex;padding:12px 16px;gap:8px;overflow-x:auto;background:#fff;flex-shrink:0}
+.filter-bar::-webkit-scrollbar{display:none}
+.f-item{padding:8px 16px;font-size:13px;color:#666;border-radius:20px;white-space:nowrap;background:#f5f5f5;cursor:pointer;transition:all .2s;flex-shrink:0}
+.f-item.act{background:#07c160;color:#fff;font-weight:500}
+.apply-body{background:#f5f5f5;padding:8px 0 80px}
+.ap-c{background:#fff;margin:0 16px 10px;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer}
+.ap-ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ap-t{font-size:15px;font-weight:600;color:#333;flex:1;padding-right:8px}
+.ap-st{font-size:11px;padding:4px 10px;border-radius:12px;font-weight:500;white-space:nowrap}
+.ap-st.pd{background:#fef3c7;color:#d97706}
+.ap-st.in{background:#dbeafe;color:#2563eb}
+.ap-st.ok{background:#d1fae5;color:#059669}
+.ap-info{display:flex;gap:12px;font-size:12px;color:#666;flex-wrap:wrap}
+.ap-info span{display:flex;align-items:center;gap:4px}
+.ap-countdown{margin-top:10px;padding:10px 12px;background:#f0fdf4;border-radius:8px;font-size:12px;color:#059669}
+.ap-actions{display:flex;gap:8px;margin-top:12px}
+.ap-btn{flex:1;padding:10px;border-radius:8px;font-size:13px;text-align:center;border:none;cursor:pointer;transition:all .2s;font-weight:500}
+.ap-btn.pr{background:#07c160;color:#fff}
+.ap-btn.sc{background:#f5f5f5;color:#666}
+.ap-btn.dg{background:#fee2e2;color:#dc2626}
+
+/* 面试详情弹窗 */
+.interview-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:500;display:none}
+.interview-overlay.show{display:block}
+.interview-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;max-height:85vh;overflow-y:auto;animation:slideUp .3s;padding-bottom:env(safe-area-inset-bottom,16px)}
+.interview-sheet .isec{padding:14px 20px;border-bottom:1px solid #f0f0f0}
+.interview-sheet .isec h4{font-size:14px;font-weight:600;color:#333;margin-bottom:10px}
+.intel-item{display:flex;justify-content:space-between;padding:8px 0;font-size:13px;color:#666;border-bottom:1px solid #f8f8f8}
+.intel-item:last-child{border-bottom:none}
+.intel-item .v{color:#333;font-weight:500;text-align:right;max-width:60%}
+.intel-map{height:100px;background:#f0f0f0;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#999;font-size:13px;margin-top:10px}
+.intel-actions{display:flex;gap:10px;padding:14px 20px}
+.intel-actions button{flex:1;padding:12px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+.intel-actions .call{background:#07c160;color:#fff}
+.intel-actions .nav{background:#3b82f6;color:#fff}
+
+/* ============================================================
+   AI简历录入
+   ============================================================ */
+#page-ai .ai-hd{background:linear-gradient(135deg,#8b5cf6,#7c3aed);padding:16px 20px 20px;text-align:center;flex-shrink:0}
+#page-ai .ai-hd h2{color:#fff;font-size:18px;margin-bottom:4px}
+#page-ai .ai-hd p{color:rgba(255,255,255,.8);font-size:12px}
+.chat-bg{background:#f5f5f5;padding:14px 16px 0;display:flex;flex-direction:column}
+.msg-area{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding-bottom:12px}
+.msg{max-width:88%;animation:fadeInUp .3s}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.msg.ai{align-self:flex-start}
+.msg.user{align-self:flex-end}
+.msg .b{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.6}
+.msg.ai .b{background:#fff;color:#333;border-bottom-left-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.msg.user .b{background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border-bottom-right-radius:4px}
+.rp{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.rp-item{background:#fff;border:1px solid #e5e5e5;padding:8px 14px;border-radius:20px;font-size:13px;color:#666;cursor:pointer;transition:all .2s}
+.rp-item:active{background:#8b5cf6;color:#fff;border-color:#8b5cf6}
+.rp-card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin:6px 0}
+.rp-card h4{font-size:15px;color:#333;margin-bottom:12px}
+.rf{display:flex;padding:8px 0;border-bottom:1px solid #f5f5f5}
+.rf:last-child{border-bottom:none}
+.rf-l{width:65px;font-size:13px;color:#999;flex-shrink:0}
+.rf-v{flex:1;font-size:14px;color:#333;font-weight:500}
+.chat-bar{background:#fff;padding:10px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 -2px 10px rgba(0,0,0,.05);flex-shrink:0}
+.v-btn{width:46px;height:46px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border-radius:50%;border:none;color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .2s}
+.v-btn:active{transform:scale(.9)}
+.v-btn.rec{animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.chat-in{flex:1;border:none;font-size:14px;outline:none;background:#f5f5f5;padding:10px 14px;border-radius:24px}
+.snd{width:46px;height:46px;background:#8b5cf6;border-radius:50%;border:none;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+
+/* ============================================================
+   智能打卡
+   ============================================================ */
+#page-clock .ck-hd{background:linear-gradient(135deg,#1e40af,#3b82f6);padding:20px;text-align:center;flex-shrink:0}
+.ck-time{color:#fff;font-size:48px;font-weight:200;letter-spacing:3px;margin-bottom:4px}
+.ck-date{color:rgba(255,255,255,.7);font-size:13px}
+.ck-body{background:#f5f5f5;padding:14px 16px 80px}
+.ck-card{background:#fff;border-radius:20px;padding:24px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.08);margin-bottom:14px}
+.ck-stat{display:flex;justify-content:center;gap:48px;margin-bottom:22px}
+.ck-si{text-align:center}
+.ck-ic{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:18px}
+.ck-ic.ci{background:#dbeafe;color:#3b82f6}
+.ck-ic.co{background:#fee2e2;color:#ef4444}
+.ck-sl{font-size:12px;color:#999}
+.ck-st{font-size:15px;font-weight:700;color:#333;margin-top:2px}
+.ck-btn{width:130px;height:130px;border-radius:50%;border:none;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:all .3s}
+.ck-btn.in{background:linear-gradient(135deg,#3b82f6,#2563eb);box-shadow:0 8px 30px rgba(59,130,246,.4)}
+.ck-btn.out{background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 8px 30px rgba(239,68,68,.4)}
+.ck-btn:active{transform:scale(.93)}
+.ck-btn .sub{display:block;font-size:11px;font-weight:400;margin-top:4px;opacity:.8}
+.leave-card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:14px}
+.leave-card h4{font-size:14px;color:#333;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.leave-card h4 span{font-size:12px;color:#07c160;cursor:pointer}
+.leave-stat{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.leave-item{background:#f9fafb;border-radius:12px;padding:12px;text-align:center}
+.leave-item .num{font-size:20px;font-weight:700;color:#333}
+.leave-item .lb{font-size:11px;color:#999;margin-top:4px}
+.cal-card{background:#fff;border-radius:16px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:14px}
+.cal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.cal-nav{display:flex;align-items:center;gap:10px}
+.cal-nav button{width:26px;height:26px;border-radius:50%;border:none;background:#f5f5f5;cursor:pointer;font-size:13px}
+.cal-m{font-size:15px;font-weight:600;color:#333}
+.cal-w{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;color:#999;margin-bottom:6px}
+.cal-d{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.cal-d .d{padding:6px 0;font-size:13px;color:#333;border-radius:50%;width:32px;margin:0 auto}
+.cal-d .d.om{color:#ddd}
+.cal-d .d.td{background:#3b82f6;color:#fff;font-weight:600}
+.cal-d .d.pr{background:#d1fae5;color:#059669}
+.cal-d .d.hl{color:#f97316}
+.cal-d .d.leave{background:#fef3c7;color:#d97706}
+.sal-card{background:linear-gradient(135deg,#10b981,#059669);border-radius:16px;padding:18px;color:#fff;margin-bottom:14px}
+.sal-ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sal-ch h3{font-size:14px}
+.sal-ch span{font-size:11px;opacity:.7}
+.sal-am{font-size:30px;font-weight:700;margin-bottom:4px}
+.sal-dt{font-size:12px;opacity:.75}
+.sal-bd{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.2)}
+.sal-bi{text-align:center}
+.sal-bv{font-size:17px;font-weight:600}
+.sal-bl{font-size:11px;opacity:.7;margin-top:2px}
+
+/* ============================================================
+   个人中心
+   ============================================================ */
+#page-profile .pf-hd{background:linear-gradient(135deg,#07c160,#10b980);padding:24px 20px;text-align:center}
+.pf-av{width:76px;height:76px;border-radius:50%;background:#fff;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:34px;border:3px solid rgba(255,255,255,.3)}
+.pf-nm{color:#fff;font-size:20px;font-weight:600;margin-bottom:2px}
+.pf-id{color:rgba(255,255,255,.6);font-size:12px}
+.pf-bd{display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.pf-bg{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:12px;color:#fff;font-size:11px}
+.pf-body{background:#f5f5f5;padding:14px 16px 80px}
+.pf-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.pf-sc{background:#fff;border-radius:14px;padding:14px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.pf-sv{font-size:24px;font-weight:700;color:#333}
+.pf-sv.g{color:#07c160}.pf-sv.b{color:#3b82f6}.pf-sv.o{color:#f97316}
+.pf-sl{font-size:11px;color:#999;margin-top:4px}
+.pf-menu{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.m-item{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid #f5f5f5;cursor:pointer;transition:background .2s}
+.m-item:last-child{border-bottom:none}
+.m-item:active{background:#f9f9f9}
+.m-ic{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-right:12px;flex-shrink:0}
+.m-ic.g{background:#d1fae5}.m-ic.b{background:#dbeafe}.m-ic.p{background:#ede9fe}.m-ic.o{background:#ffedd5}.m-ic.r{background:#fee2e2}.m-ic.c{background:#cffafe}
+.m-tx{flex:1}
+.m-tx h4{font-size:15px;font-weight:500;color:#333}
+.m-tx p{font-size:12px;color:#999;margin-top:2px}
+.m-ar{color:#ccc;font-size:18px}
+.m-bd{background:#ef4444;color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;margin-right:8px;font-weight:600}
+
+/* ============================================================
+   消息通知
+   ============================================================ */
+#page-msg .page-hd{background:#fff;padding:12px 20px;border-bottom:1px solid #f0f0f0;flex-shrink:0;padding-top:calc(12px + env(safe-area-inset-top,0px))}
+#page-msg .page-hd h2{font-size:18px;font-weight:600;color:#333}
+.msg-tabs{display:flex;background:#fff;padding:0 16px;gap:0;border-bottom:1px solid #f0f0f0;flex-shrink:0}
+.msg-t{flex:1;text-align:center;padding:12px 0;font-size:14px;color:#999;position:relative;cursor:pointer}
+.msg-t.act{color:#07c160;font-weight:600}
+.msg-t.act::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:24px;height:3px;background:#07c160;border-radius:2px}
+.msg-t .tb{background:#ef4444;color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:4px}
+.msg-body{background:#f5f5f5;padding:8px 0 80px}
+.msg-i{background:#fff;margin:0 16px 10px;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;transition:all .2s}
+.msg-i:active{transform:scale(.99)}
+.msg-i.unread{border-left:3px solid #07c160}
+.msg-ih{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.msg-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.msg-ic.jb{background:#d1fae5}.msg-ic.sy{background:#dbeafe}.msg-ic.ai{background:#ede9fe}.msg-ic.wg{background:#fef3c7}
+.msg-it{flex:1}
+.msg-it h4{font-size:14px;font-weight:600;color:#333}
+.msg-it span{font-size:11px;color:#999}
+.msg-dot{width:8px;height:8px;background:#ef4444;border-radius:50%;flex-shrink:0}
+.msg-c{font-size:13px;color:#666;line-height:1.5}
+.msg-act{margin-top:10px;display:inline-block;background:#07c160;color:#fff;font-size:11px;padding:6px 14px;border-radius:16px;font-weight:500}
+
+/* ===== 工作状态管理 ===== */
+.status-bar{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border-radius:20px;padding:8px 14px;cursor:pointer;margin-top:12px}
+.status-bar:active{transform:scale(.98)}
+.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.status-text{color:#fff;font-size:13px;font-weight:500}
+.status-arrow{color:rgba(255,255,255,.5);font-size:11px;margin-left:auto}
+
+/* ===== 简历完善度 ===== */
+.resume-progress{background:#fff;border-radius:16px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:14px}
+.resume-progress .rp-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.resume-progress .rp-hd h4{font-size:14px;font-weight:600;color:#333}
+.resume-progress .rp-hd span{font-size:12px;font-weight:600;color:#07c160}
+.resume-progress .rp-bar{height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden;margin-bottom:8px}
+.resume-progress .rp-bar .fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#10b981,#34d399)}
+.resume-progress .rp-items{display:flex;gap:6px;flex-wrap:wrap}
+.resume-progress .rp-items .it{font-size:11px;padding:2px 8px;border-radius:4px}
+.resume-progress .rp-items .it.done{background:#d1fae5;color:#059669}
+.resume-progress .rp-items .it.todo{background:#f5f5f5;color:#bbb}
+
+/* ===== 应聘进度 ===== */
+.ap-step{display:flex;align-items:center;gap:4px;margin:8px 0;padding:8px 0}
+.ap-step .s{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;position:relative}
+.ap-step .s .dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600}
+.ap-step .s .dot.done{background:#07c160;color:#fff}
+.ap-step .s .dot.cur{background:#07c160;color:#fff;box-shadow:0 0 0 3px rgba(7,193,96,.2)}
+.ap-step .s .dot.pending{background:#e5e7eb;color:#999}
+.ap-step .s .lb{font-size:9px;color:#999;white-space:nowrap}
+.ap-step .s .lb.done{color:#07c160;font-weight:500}
+.ap-step .s .lb.cur{color:#333;font-weight:500}
+.ap-step .line{flex:1;height:2px;background:#e5e7eb;margin-top:-18px}
+.ap-step .line.done{background:#07c160}
+
+.pf-status-card{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.12);border-radius:12px;padding:10px 14px;cursor:pointer;margin-top:12px;backdrop-filter:blur(4px)}
+.pf-status-card:active{background:#f1f5f9}
+
+/* 状态切换弹窗 */
+.status-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:2000;display:none;align-items:flex-end;justify-content:center}
+.status-overlay.show{display:flex}
+.status-sheet{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;animation:slideUp .3s;padding-bottom:env(safe-area-inset-bottom,16px)}
+.status-handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:12px auto 12px}
+.status-title{font-size:17px;font-weight:600;color:#333;text-align:center;margin-bottom:4px}
+.status-desc{font-size:12px;color:#999;text-align:center;margin-bottom:16px}
+.status-options{padding:0 20px;display:flex;flex-direction:column;gap:8px}
+.status-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;cursor:pointer;transition:all .2s}
+.status-opt:active{transform:scale(.98)}
+.status-opt.active{background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b}
+.status-opt.inactive{background:#f8fafc;border:0.5px solid #e2e8f0}
+.status-opt-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.status-opt-info{flex:1}
+.status-opt-name{font-size:15px;font-weight:500}
+.status-opt-desc{font-size:12px;color:#999;margin-top:2px}
+.status-opt-check{font-size:13px;font-weight:500}
+  .status-cancel{display:block;width:calc(100% - 40px);margin:12px auto 16px;padding:14px 0;background:#f5f5f5;color:#666;border:none;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;text-align:center}
+
+/* ===== 课程详情 ===== */
+.course-body{padding:0 0 80px;background:#f5f5f5;overflow-y:auto;flex:1}
+.course-bg{height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;position:relative;flex-shrink:0}
+.course-bg .back-btn{position:absolute;top:44px;left:16px;width:32px;height:32px;background:rgba(0,0,0,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:none;color:#fff}
+.course-bg .ct{font-size:22px;font-weight:700;margin-bottom:6px}
+.course-bg .cs{font-size:12px;opacity:.85}
+.course-ct{background:#fff;border-radius:16px 16px 0 0;margin-top:-16px;position:relative;z-index:2;padding:16px 20px}
+.course-ct h3{font-size:17px;font-weight:600;color:#333;margin-bottom:4px}
+.course-ct .price{font-size:20px;font-weight:700;color:#d97706;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.course-ct .price .orig{font-size:13px;color:#bbb;text-decoration:line-through;font-weight:400}
+.course-ct .price .points{font-size:12px;color:#999;font-weight:400}
+.course-info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0;padding:12px;background:#f9fafb;border-radius:12px}
+.course-info-item{text-align:center}
+.course-info-item .num{font-size:16px;font-weight:700;color:#333}
+.course-info-item .lb{font-size:10px;color:#999;margin-top:2px}
+.course-progress{background:#f9fafb;border-radius:12px;padding:14px;margin-bottom:16px}
+.course-progress .ph{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px}
+.course-progress .bar{height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden}
+.course-progress .bar .fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#f59e0b,#d97706)}
+
+.course-sections{margin-bottom:16px}
+.course-sections h4{font-size:14px;font-weight:600;color:#333;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sec-item{display:flex;align-items:center;padding:12px 14px;background:#f9fafb;border-radius:10px;margin-bottom:6px;cursor:pointer;transition:all .15s}
+.sec-item:active{transform:scale(.99)}
+.sec-item .idx{width:24px;height:24px;border-radius:50%;background:#e5e7eb;color:#999;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:12px}
+.sec-item .idx.done{background:#07c160;color:#fff}
+.sec-item .idx.cur{background:#f59e0b;color:#fff}
+.sec-item .info{flex:1}
+.sec-item .info .tt{font-size:13px;color:#333;font-weight:500}
+.sec-item .info .sub{font-size:11px;color:#999;margin-top:2px}
+.sec-item .dur{font-size:11px;color:#999;flex-shrink:0}
+.sec-item .status-tag{padding:2px 8px;border-radius:4px;font-size:10px;margin-left:8px}
+.sec-item .status-tag.free{background:#d1fae5;color:#059669}
+.sec-item .status-tag.lock{background:#f5f5f5;color:#ccc}
+
+.course-actions{display:flex;gap:10px;padding:14px 20px;background:#fff;border-top:1px solid #f0f0f0;position:sticky;bottom:0}
+.course-actions button{flex:1;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:transform .2s}
+.course-actions button:active{transform:scale(.97)}
+.course-actions .buy{background:linear-gradient(135deg,#07c160,#10b980);color:#fff}
+.course-actions .points-buy{background:#fef3c7;color:#d97706}
+.course-actions .try-free{background:#f5f5f5;color:#666}
+
+/* ===== 积分明细 ===== */
+.points-body{padding-bottom:80px;background:#f5f5f5;min-height:100%}
+.points-hd{background:linear-gradient(135deg,#fef3c7,#fde68a);padding:20px;text-align:center}
+.points-hd .total{font-size:36px;font-weight:700;color:#92400e}
+.points-hd .lb{font-size:12px;color:#b45309;margin-top:2px}
+.points-earn{display:flex;justify-content:center;gap:20px;margin-top:10px;font-size:11px;color:#b45309}
+.points-earn span{display:flex;align-items:center;gap:4px}
+.points-list{background:#fff;margin:0 0 0;padding:0 16px}
+.pts-header{display:flex;justify-content:space-between;padding:14px 16px;font-size:14px;font-weight:600;color:#333;background:#fff;border-bottom:1px solid #f0f0f0}
+.pts-item{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid #f5f5f5}
+.pts-item:last-child{border-bottom:none}
+.pts-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-right:12px;flex-shrink:0}
+.pts-info{flex:1}
+.pts-info .tt{font-size:13px;font-weight:500;color:#333}
+.pts-info .tm{font-size:11px;color:#999;margin-top:2px}
+.pts-val{font-size:15px;font-weight:600;white-space:nowrap}
+.pts-val.plus{color:#07c160}
+.pts-val.minus{color:#ef4444}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ================================================
+       首页
+       ================================================ -->
+  <div class="page active" id="page-home">
+    <div class="sb" style="background:linear-gradient(135deg,#07c160,#10b980)">
+      <div class="sbc"><span id="livetime">09:41</span><span>📶 🔋</span></div>
+    </div>
+    <div class="home-hd">
+      <div class="home-hdt">
+        <h2>找好活，上熊猫</h2>
+        <div class="hd-icons">
+          <div class="hd-icon" onclick="toggleSearch()">🔍</div>
+          <div class="hd-icon" onclick="switchPage('msg')">💬<span class="dot"></span></div>
+        </div>
+      </div>
+      <div class="ai-card" onclick="switchPage('ai')">
+        <div class="ai-av">🤖</div>
+        <div class="ai-info">
+          <h3>AI简历助手</h3>
+          <p>说话就能录入简历 · 点我试试</p>
+        </div>
+        <div class="ai-ar">›</div>
+      </div>
+      <!-- 搜索栏 -->
+      <div id="searchBar" style="display:none;padding:0 16px 8px;animation:fadeIn .2s">
+        <div style="display:flex;align-items:center;background:#fff;border-radius:24px;padding:4px 4px 4px 16px;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+          <span style="font-size:16px;margin-right:8px">🔍</span>
+          <input placeholder="搜索岗位..." style="flex:1;border:none;background:transparent;font-size:14px;outline:none;color:#333" oninput="searchJobs(this.value)">
+          <span style="font-size:18px;color:#ccc;cursor:pointer;padding:4px 8px" onclick="closeSearch()">✕</span>
+        </div>
+      </div>
+      <div class="status-bar" onclick="showStatusModal()">
+        <span class="status-dot" id="homeStatusDot" style="background:#f59e0b"></span>
+        <span class="status-text" id="homeStatusText">当前状态：待岗中</span>
+        <span class="status-arrow">点击切换 ∨</span>
+      </div>
+    </div>
+    <div class="home-body">
+      <div class="cat-grid">
+        <div class="cat-item" onclick="filterJobs('小孩')"><div class="cat-ic g">👶</div><div class="cat-lb">带小孩</div></div>
+        <div class="cat-item" onclick="filterJobs('老人')"><div class="cat-ic b">🧓</div><div class="cat-lb">照顾老人</div></div>
+        <div class="cat-item" onclick="filterJobs('做饭')"><div class="cat-ic p">🍳</div><div class="cat-lb">做饭</div></div>
+        <div class="cat-item" onclick="filterJobs('保洁')"><div class="cat-ic o">🧹</div><div class="cat-lb">保洁</div></div>
+      </div>
+      <div class="sec-t"><h3>🎯 智能推荐</h3><span>查看更多 ›</span></div>
+      <!-- 状态提示条 -->
+      <div id="statusTip" style="margin:0 16px 10px;padding:10px 14px;background:#f0fdf4;border:1px solid #a7f3d0;border-radius:12px;font-size:12px;color:#065f46;display:flex;align-items:center;gap:8px">
+        <span id="statusTipText">✅ 您当前待岗中，以下岗位推荐给您</span>
+      </div>
+      <!-- 岗位列表 -->
+      <div id="jobList">
+        <div class="job-c" onclick="showJobDetail(0)">
+          <span class="match-badge">AI 96%匹配</span>
+          <div class="job-ch"><div class="job-t">【住家保姆】三室一厅 照顾1岁宝宝</div><div class="job-s">¥6,000/月</div></div>
+          <div class="job-tags"><span class="job-tg">🏠 住家</span><span class="job-tg b">👶 照顾小孩</span><span class="job-tg p">📍 五缘湾</span><span class="job-tg o">📅 立即上岗</span></div>
+          <div class="job-f"><span class="job-co">厦门鹭岛家政公司</span><span class="job-d">📍 距您2.3km</span></div>
+        </div>
+        <div class="job-c" onclick="showJobDetail(1)">
+          <div class="job-ch"><div class="job-t">【白班保姆】四室两厅 日常保洁</div><div class="job-s">¥4,500/月</div></div>
+          <div class="job-tags"><span class="job-tg">☀️ 白班</span><span class="job-tg b">🧹 日常保洁</span><span class="job-tg p">📍 思明区</span></div>
+          <div class="job-f"><span class="job-co">好阿姨平台</span><span class="job-d">📍 距您5.1km</span></div>
+        </div>
+        <div class="job-c" onclick="showJobDetail(2)">
+          <div class="job-ch"><div class="job-t">【钟点工】每天2小时 买菜做饭</div><div class="job-s">¥2,800/月</div></div>
+          <div class="job-tags"><span class="job-tg">⏰ 钟点</span><span class="job-tg b">🍳 做饭</span><span class="job-tg p">📍 思明区</span></div>
+          <div class="job-f"><span class="job-co">熊猫家政</span><span class="job-d">📍 距您1.8km</span></div>
+        </div>
+      </div>
+      <!-- 筛选无结果 -->
+      <div id="jobEmpty" style="display:none;margin:0 16px 16px;padding:30px 20px;background:#fff;border-radius:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.05)">
+        <div style="font-size:40px;margin-bottom:10px">📭</div>
+        <div style="font-size:14px;font-weight:500;color:#666;margin-bottom:4px">暂无该分类岗位</div>
+        <div style="font-size:12px;color:#999;cursor:pointer" onclick="filterJobs('')">查看全部岗位 ›</div>
+      </div>
+      <!-- 上户中/已转行占位 -->
+      <div id="statusPlaceholder" style="display:none;margin:0 16px 16px;padding:30px 20px;background:#fff;border-radius:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.05)">
+        <div style="font-size:40px;margin-bottom:10px" id="statusIcon">🔵</div>
+        <div style="font-size:15px;font-weight:600;color:#333;margin-bottom:6px" id="statusTitle">您当前正在上户中</div>
+        <div style="font-size:12px;color:#999;line-height:1.6" id="statusDesc">您已有关联雇主，暂不推荐新岗位。如需查看历史岗位，请切换工作状态。</div>
+      </div>
+    </div>
+    <div class="tabbar" id="tabbar-home">
+      <div class="tab-item act" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
+      <div class="tab-item" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
+      <div class="tab-item" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
+      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
+    </div>
+  </div>
+
+  <!-- ================================================
+       自习室 · 技能培训
+       ================================================ -->
+  <div class="page" id="page-study" style="overflow:hidden">
+    <div class="sb" style="background:linear-gradient(135deg,#f59e0b,#d97706)"><div class="sbc"><span id="livetime3">09:41</span><span>📶 🔋</span></div></div>
+    <div style="background:linear-gradient(135deg,#f59e0b,#d97706);padding:16px 20px;text-align:center">
+      <h2 style="color:#fff;font-size:18px;margin-bottom:4px">📚 自习室</h2>
+      <p style="color:rgba(255,255,255,.8);font-size:12px">学习技能 · 考取证书 · 提升自己</p>
+    </div>
+    <div style="flex:1;overflow-y:auto;background:#f5f5f5;padding:14px 16px 80px">
+      <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:14px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;cursor:pointer" onclick="switchPage('points')">
+        <div><div style="font-size:12px;color:#92400e">我的积分</div><div style="font-size:24px;font-weight:700;color:#92400e">350</div></div>
+        <div style="text-align:right;font-size:11px;color:#b45309;line-height:1.6">🎯 拉新阿姨 +30分<br>⏰ 每日打卡 +5分</div>
+      </div>
+      <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:10px">热门课程</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer" onclick="showCourseDetail(0)">
+          <div style="height:100px;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:36px">📖</div>
+          <div style="padding:10px 14px"><div style="font-size:13px;font-weight:600;color:#333;margin-bottom:2px">月嫂上户必备91项技能</div><div style="font-size:11px;color:#999">48节课 · ¥980 · ▶免费试听</div></div>
+        </div>
+        <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer" onclick="showCourseDetail(1)">
+          <div style="height:100px;background:linear-gradient(135deg,#9333ea,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:36px">👶</div>
+          <div style="padding:10px 14px"><div style="font-size:13px;font-weight:600;color:#333;margin-bottom:2px">高级育婴师</div><div style="font-size:11px;color:#999">36节课 · ¥980 · ▶免费试听</div></div>
+        </div>
+        <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer" onclick="showCourseDetail(2)">
+          <div style="height:100px;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;font-size:36px">🍼</div>
+          <div style="padding:10px 14px"><div style="font-size:13px;font-weight:600;color:#333;margin-bottom:2px">高级催乳师</div><div style="font-size:11px;color:#999">42节课 · ¥980 · ▶免费试听</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="tabbar">
+      <div class="tab-item" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
+      <div class="tab-item" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
+      <div class="tab-item act" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
+      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
+    </div>
+  </div>
+
+  <!-- ================================================
+       应聘管理
+       ================================================ -->
+  <div class="page" id="page-apply">
+    <div class="page-hd"><h2>📋 我的应聘</h2></div>
+    <div class="filter-bar">
+      <div class="f-item act">全部(3)</div>
+      <div class="f-item">待面试(1)</div>
+      <div class="f-item">已通过(1)</div>
+      <div class="f-item">待上岗(1)</div>
+    </div>
+    <div class="apply-body">
+      <div class="ap-c" onclick="showInterview()">
+        <div class="ap-ch"><div class="ap-t">【住家保姆】三室一厅</div><span class="ap-st in">🎯 待面试</span></div>
+        <div class="ap-step">
+          <div class="s"><div class="dot done">✓</div><div class="lb done">投递</div></div>
+          <div class="line done"></div>
+          <div class="s"><div class="dot cur">2</div><div class="lb cur">面试</div></div>
+          <div class="line"></div>
+          <div class="s"><div class="dot pending">3</div><div class="lb">通过</div></div>
+          <div class="line"></div>
+          <div class="s"><div class="dot pending">4</div><div class="lb">上户</div></div>
+        </div>
+        <div class="ap-info"><span>🏠 鹭岛家政</span><span>📅 5月8日 14:00</span><span>📍 思明区</span></div>
+        <div class="ap-countdown">⏰ 距面试还有 2天 4小时</div>
+        <div class="ap-actions">
+          <div class="ap-btn pr" onclick="event.stopPropagation();showToast('📞 正在联系客户...')">📞 联系客户</div>
+          <div class="ap-btn sc" onclick="event.stopPropagation();showConfirm('📅','添加日历提醒','是否添加到系统日历？',()=>showToast('📅 日历提醒已添加'))">📅 加日历</div>
+        </div>
+      </div>
+      <div class="ap-c">
+        <div class="ap-ch"><div class="ap-t">【白班保姆】日常保洁</div><span class="ap-st pd">⏳ 等待审核</span></div>
+        <div class="ap-info"><span>🏠 好阿姨平台</span><span>📅 今天 15:02 投递</span></div>
+        <div class="ap-actions">
+          <div class="ap-btn sc" onclick="showToast('📋 查看岗位详情')">📋 查看详情</div>
+          <div class="ap-btn dg" onclick="showConfirm('⚠️','确认撤回','确定撤回该应聘申请？',()=>showToast('🔄 已撤回申请'))">撤回申请</div>
+        </div>
+      </div>
+      <div class="ap-c">
+        <div class="ap-ch"><div class="ap-t">【钟点工】两小时保洁</div><span class="ap-st ok">✅ 已通过</span></div>
+        <div class="ap-info"><span>🏠 鹭岛家政</span><span>📅 明天上岗</span></div>
+        <div class="ap-actions">
+          <div class="ap-btn pr" onclick="showConfirm('✅','确认上岗','确认明天前往客户家开始服务？',()=>showToast('🎉 已确认上岗！'))">✅ 确认上岗</div>
+          <div class="ap-btn sc" onclick="showToast('📞 正在拨打客户电话...')">📞 联系客户</div>
+        </div>
+      </div>
+    </div>
+    <div class="tabbar">
+      <div class="tab-item" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
+      <div class="tab-item act" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
+      <div class="tab-item" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
+      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
+    </div>
+  </div>
+
+  <!-- ================================================
+       AI简历录入
+       ================================================ -->
+  <div class="page" id="page-ai" style="overflow:hidden;background:#f5f5f5">
+    <div class="sb" style="background:#fff"><div class="sbc dark"><span id="livetime2">09:41</span><span>📶 🔋</span></div></div>
+    <div style="background:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px">🤖</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#1a1a2e">AI简历助手</div>
+          <div style="font-size:10px;color:#999">智能语音对话 · 3分钟生成简历</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#4f46e5;font-weight:500;cursor:pointer" onclick="showToast('简历已生成，请查看预览')">预览 ›</div>
+    </div>
+    <!-- 进度条 -->
+    <div style="padding:8px 20px;background:#fff;display:flex;align-items:center;gap:10px">
+      <div style="flex:1;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden">
+        <div style="width:45%;height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:3px;transition:width .4s" id="aiProgress"></div>
+      </div>
+      <span style="font-size:11px;color:#999;white-space:nowrap">45%</span>
+    </div>
+    <!-- 对话区 -->
+    <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px" id="aiChat">
+      <!-- AI消息 -->
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        <div style="width:28px;height:28px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0">AI</div>
+        <div style="max-width:85%">
+          <div style="background:#fff;padding:10px 14px;border-radius:14px 14px 14px 4px;font-size:13px;color:#333;line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,.05)">你好！我是AI简历助手 🤖<br>我将通过几个简单问题帮你创建完整的求职简历，整个过程只需要3分钟。准备好了吗？</div>
+        </div>
+      </div>
+      <!-- AI问姓名 -->
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        <div style="width:28px;height:28px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0">AI</div>
+        <div style="max-width:85%">
+          <div style="background:#fff;padding:10px 14px;border-radius:14px 14px 14px 4px;font-size:13px;color:#333;line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,.05)">请告诉我你的<span style="color:#4f46e5;font-weight:500">姓名</span>和<span style="color:#4f46e5;font-weight:500">年龄</span>？</div>
+        </div>
+      </div>
+      <!-- 用户回复 -->
+      <div style="display:flex;gap:8px;align-items:flex-start;flex-direction:row-reverse">
+        <div style="width:28px;height:28px;background:#e0e7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#4f46e5;font-size:13px;flex-shrink:0">我</div>
+        <div style="max-width:85%">
+          <div style="background:#eef2ff;padding:10px 14px;border-radius:14px 14px 4px 14px;font-size:13px;color:#333;line-height:1.6">王桂芳，42岁</div>
+        </div>
+      </div>
+      <!-- AI问经验 -->
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        <div style="width:28px;height:28px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0">AI</div>
+        <div style="max-width:85%">
+          <div style="background:#fff;padding:10px 14px;border-radius:14px 14px 14px 4px;font-size:13px;color:#333;line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,.05)">好的，王桂芳阿姨 👋<br>你主要做哪类家政工作？有多少年<span style="color:#4f46e5;font-weight:500">经验</span>？</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+            <span style="padding:5px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;font-size:12px;color:#333;cursor:pointer" onclick="quickReply(this)">月嫂</span>
+            <span style="padding:5px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;font-size:12px;color:#333;cursor:pointer" onclick="quickReply(this)">育儿嫂</span>
+            <span style="padding:5px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;font-size:12px;color:#333;cursor:pointer" onclick="quickReply(this)">保洁</span>
+            <span style="padding:5px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;font-size:12px;color:#333;cursor:pointer" onclick="quickReply(this)">护工</span>
+          </div>
+        </div>
+      </div>
+      <!-- 用户回复 -->
+      <div style="display:flex;gap:8px;align-items:flex-start;flex-direction:row-reverse">
+        <div style="width:28px;height:28px;background:#e0e7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#4f46e5;font-size:13px;flex-shrink:0">我</div>
+        <div style="max-width:85%">
+          <div style="background:#eef2ff;padding:10px 14px;border-radius:14px 14px 4px 14px;font-size:13px;color:#333;line-height:1.6">育儿嫂，8年经验</div>
+        </div>
+      </div>
+      <!-- AI问技能 -->
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        <div style="width:28px;height:28px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0">AI</div>
+        <div style="max-width:85%">
+          <div style="background:#fff;padding:10px 14px;border-radius:14px 14px 14px 4px;font-size:13px;color:#333;line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,.05)">8年经验很丰富！👍<br>你有哪些<span style="color:#4f46e5;font-weight:500">证书</span>？可以多发几条告诉我。</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+            <span style="padding:5px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;font-size:12px;color:#333;cursor:pointer" onclick="quickReply(this)">育儿嫂证</span>
+            <span style="padding:5px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;font-size:12px;color:#333;cursor:pointer" onclick="quickReply(this)">月嫂证</span>
+            <span style="padding:5px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;font-size:12px;color:#333;cursor:pointer" onclick="quickReply(this)">健康证</span>
+            <span style="padding:5px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;font-size:12px;color:#333;cursor:pointer" onclick="quickReply(this)">催乳师证</span>
+          </div>
+        </div>
+      </div>
+      <!-- 用户回复 -->
+      <div style="display:flex;gap:8px;align-items:flex-start;flex-direction:row-reverse">
+        <div style="width:28px;height:28px;background:#e0e7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#4f46e5;font-size:13px;flex-shrink:0">我</div>
+        <div style="max-width:85%">
+          <div style="background:#eef2ff;padding:10px 14px;border-radius:14px 14px 4px 14px;font-size:13px;color:#333;line-height:1.6">育儿嫂证，健康证</div>
+        </div>
+      </div>
+      <!-- AI确认信息 -->
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        <div style="width:28px;height:28px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0">AI</div>
+        <div style="max-width:85%">
+          <div style="background:#fff;padding:10px 14px;border-radius:14px 14px 14px 4px;font-size:13px;color:#333;line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,.05)">好的！我已经帮你录入了以下信息：<br><br><span style="font-weight:500">📋 姓名：</span>王桂芳<br><span style="font-weight:500">🎂 年龄：</span>42岁<br><span style="font-weight:500">💼 工种：</span>育儿嫂<br><span style="font-weight:500">📅 经验：</span>8年<br><span style="font-weight:500">📜 证书：</span>育儿嫂证、健康证<br><br>继续完善求职意向吗？</div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <span style="padding:5px 14px;background:#4f46e5;color:#fff;border-radius:16px;font-size:12px;cursor:pointer" onclick="showToast('AI正在继续提问...')">继续完善</span>
+            <span style="padding:5px 14px;background:#fff;border:1px solid #e2e8f0;color:#666;border-radius:16px;font-size:12px;cursor:pointer" onclick="previewResume()">预览简历</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 输入区 -->
+    <div style="background:#fff;padding:10px 16px;border-top:1px solid #f0f0f0;display:flex;align-items:flex-end;gap:8px">
+      <div style="width:36px;height:36px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;flex-shrink:0" onclick="showToast('🎤 正在语音识别...')">🎤</div>
+      <div style="flex:1;background:#f5f5f5;border-radius:20px;padding:8px 16px;display:flex;align-items:center">
+        <input placeholder="打字输入或点击语音..." style="flex:1;border:none;background:transparent;font-size:14px;outline:none;color:#333">
+      </div>
+      <div style="width:36px;height:36px;border-radius:50%;background:#4f46e5;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;flex-shrink:0" onclick="sendAiMsg()">↑</div>
+    </div>
+    <div class="tabbar">
+      <div class="tab-item" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
+      <div class="tab-item" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
+      <div class="tab-item" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
+      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
+    </div>
+  </div>
+
+  <!-- ================================================
+       智能打卡
+       ================================================ -->
+  <div class="page" id="page-clock">
+    <div class="ck-hd">
+      <div class="ck-time" id="clockTime">09:41</div>
+      <div class="ck-date" id="clockDate">2026年5月6日 · 星期三</div>
+    </div>
+    <div class="ck-body">
+      <div class="ck-card">
+        <div class="ck-stat">
+          <div class="ck-si"><div class="ck-ic ci">☀️</div><div class="ck-sl">上班打卡</div><div class="ck-st">08:32</div></div>
+          <div class="ck-si"><div class="ck-ic co">🌙</div><div class="ck-sl">下班打卡</div><div class="ck-st">--:--</div></div>
+        </div>
+        <button class="ck-btn out" onclick="showConfirm('⏰','下班打卡','确认下班打卡？系统将自动记录工时',()=>showToast('✅ 下班打卡成功！今日工时 8.5h'))">⏰ 下班打卡<span class="sub">点击打卡</span></button>
+      </div>
+      <div class="leave-card">
+        <h4>📋 请假管理 <span onclick="showConfirm('📝','申请请假','请假需经理审批，确认提交？',()=>showToast('📤 请假申请已提交'))">➕ 申请请假</span></h4>
+        <div class="leave-stat">
+          <div class="leave-item"><div class="num" style="color:#f97316">2</div><div class="lb">可用事假(天)</div></div>
+          <div class="leave-item"><div class="num" style="color:#3b82f6">5</div><div class="lb">可用病假(天)</div></div>
+        </div>
+        <div style="margin-top:10px;padding:10px 12px;background:#fef3c7;border-radius:8px;font-size:12px;color:#d97706">⚠️ 请假需提前一天申请，等待经理审批</div>
+      </div>
+      <div class="cal-card">
+        <div class="cal-hd">
+          <div class="cal-nav"><button>‹</button><span class="cal-m">2026年5月</span><button>›</button></div>
+          <span style="font-size:11px;color:#999">出勤 13天</span>
+        </div>
+        <div class="cal-w"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+        <div class="cal-d">
+          <span class="d om">27</span><span class="d om">28</span><span class="d om">29</span><span class="d om">30</span>
+          <span class="d hl">1</span><span class="d pr">2</span><span class="d pr">3</span>
+          <span class="d pr">4</span><span class="d pr">5</span><span class="d td">6</span><span class="d">7</span>
+          <span class="d pr">8</span><span class="d pr">9</span><span class="d pr">10</span><span class="d pr">11</span>
+          <span class="d pr">12</span><span class="d">13</span><span class="d pr">14</span><span class="d pr">15</span>
+          <span class="d pr">16</span><span class="d leave">17</span><span class="d">18</span><span class="d">19</span>
+          <span class="d">20</span><span class="d">21</span><span class="d">22</span><span class="d">23</span>
+          <span class="d">24</span><span class="d">25</span><span class="d">26</span><span class="d">27</span>
+          <span class="d">28</span><span class="d">29</span><span class="d">30</span><span class="d">31</span><span class="d om">1</span>
+        </div>
+        <div style="display:flex;gap:14px;margin-top:12px;font-size:11px;color:#999;flex-wrap:wrap">
+          <span>🟢 已出勤</span><span>🟡 请假</span><span>🔵 今天</span><span>🟠 节假日</span>
+        </div>
+      </div>
+      <div class="sal-card">
+        <div class="sal-ch"><h3>💰 本月工资预览</h3><span>实时更新</span></div>
+        <div class="sal-am">¥3,250.00</div>
+        <div class="sal-dt">截至5月6日 · 已出勤13天 · 时薪¥250</div>
+        <div class="sal-bd">
+          <div class="sal-bi"><div class="sal-bv">13天</div><div class="sal-bl">已出勤</div></div>
+          <div class="sal-bi"><div class="sal-bv">8.5h</div><div class="sal-bl">日均工时</div></div>
+          <div class="sal-bi"><div class="sal-bv">1天</div><div class="sal-bl">已请假</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="tabbar">
+      <div class="tab-item" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
+      <div class="tab-item" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
+      <div class="tab-item" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
+      <div class="tab-item act" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
+    </div>
+  </div>
+
+  <!-- ================================================
+     课程详情
+     ================================================ -->
+<div class="page" id="page-course-detail">
+  <div class="course-body">
+    <div class="course-bg" id="courseBg" style="background:linear-gradient(135deg,#1e40af,#3b82f6)">
+      <button class="back-btn" onclick="switchPage('ai')">‹</button>
+      <div class="ct" id="courseTitle">月嫂上户必备91项技能</div>
+      <div class="cs" id="courseSub">共48节课 · 含实训视频</div>
+    </div>
+    <div class="course-ct">
+      <h3 id="courseDetailTitle">月嫂上户必备91项技能</h3>
+      <div class="price">
+        <span id="coursePrice">¥980</span>
+        <span class="points" id="coursePoints">或 980积分兑换</span>
+      </div>
+      <div class="course-info-grid">
+        <div class="course-info-item"><div class="num" id="ciLessons">48</div><div class="lb">总课时</div></div>
+        <div class="course-info-item"><div class="num" id="ciDone">17</div><div class="lb">已完成</div></div>
+        <div class="course-info-item"><div class="num" id="ciHours">36h</div><div class="lb">总时长</div></div>
+        <div class="course-info-item"><div class="num" id="ciCert">✓</div><div class="lb">可考证</div></div>
+      </div>
+      <div class="course-progress">
+        <div class="ph"><span>学习进度</span><span id="coursePct">35%</span></div>
+        <div class="bar"><div class="fill" id="courseProgressBar" style="width:35%"></div></div>
+      </div>
+
+      <div class="course-sections">
+        <h4>📖 课程目录</h4>
+        <div id="courseSectionList">
+          <div class="sec-item">
+            <div class="idx done">✓</div>
+            <div class="info">
+              <div class="tt">第一章：月嫂职业素养</div>
+              <div class="sub">职业礼仪 · 职业道德 · 法律法规</div>
+            </div>
+            <div class="dur">3节</div>
+            <span class="status-tag free">免费</span>
+          </div>
+          <div class="sec-item">
+            <div class="idx done">✓</div>
+            <div class="info">
+              <div class="tt">第二章：产妇护理基础</div>
+              <div class="sub">产后恢复 · 伤口护理 · 营养餐</div>
+            </div>
+            <div class="dur">5节</div>
+          </div>
+          <div class="sec-item">
+            <div class="idx cur">3</div>
+            <div class="info">
+              <div class="tt">第三章：新生儿护理</div>
+              <div class="sub">洗澡 · 抚触 · 脐带护理 · 黄疸观察</div>
+            </div>
+            <div class="dur">6节</div>
+          </div>
+          <div class="sec-item">
+            <div class="idx">4</div>
+            <div class="info">
+              <div class="tt">第四章：母乳喂养指导</div>
+              <div class="sub">哺乳姿势 · 追奶 · 乳腺炎预防</div>
+            </div>
+            <div class="dur">4节</div>
+          </div>
+          <div class="sec-item">
+            <div class="idx">5</div>
+            <div class="info">
+              <div class="tt">第五章：婴幼儿常见病护理</div>
+              <div class="sub">发热处理 · 腹泻护理 · 湿疹护理</div>
+            </div>
+            <div class="dur">6节</div>
+          </div>
+          <div class="sec-item">
+            <div class="idx">6</div>
+            <div class="info">
+              <div class="tt">第六章：月子餐制作</div>
+              <div class="sub">分阶段食谱 · 营养搭配 · 实操</div>
+            </div>
+            <div class="dur">5节</div>
+          </div>
+          <div class="sec-item">
+            <div class="idx">7</div>
+            <div class="info">
+              <div class="tt">第七章：实操考核与证书</div>
+              <div class="sub">模拟考核 · 证书报考指引</div>
+            </div>
+            <div class="dur">6节</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="course-actions">
+    <button class="try-free" onclick="showToast('▶ 正在播放第1节免费试听课...')">▶ 免费试听</button>
+    <button class="points-buy" onclick="showConfirm('📚','积分兑换','确认使用980积分兑换此课程？当前积分：350',()=>showToast('❌ 积分不足，还需630积分'))">🎯 积分兑换</button>
+    <button class="buy" onclick="showToast('🛒 正在跳转支付...')">立即购买 ¥980</button>
+  </div>
+</div>
+
+<!-- ================================================
+     积分明细
+     ================================================ -->
+<div class="page" id="page-points">
+  <div style="background:#fff;padding:12px 20px;border-bottom:1px solid #f0f0f0;padding-top:calc(12px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:12px">
+    <span style="font-size:20px;cursor:pointer" onclick="switchPage('ai')">‹</span>
+    <h2 style="font-size:18px;font-weight:600;color:#333;flex:1">积分明细</h2>
+    <span style="font-size:12px;color:#07c160;cursor:pointer" onclick="showToast('📋 积分规则：拉新+30分 · 每日打卡+5分 · 学习+10分')">规则</span>
+  </div>
+  <div class="points-body">
+    <div class="points-hd">
+      <div class="total">350</div>
+      <div class="lb">当前积分</div>
+      <div class="points-earn">
+        <span>🎯 拉新阿姨 +30分</span>
+        <span>⏰ 每日打卡 +5分</span>
+        <span>📖 学习 +10分</span>
+      </div>
+    </div>
+    <div class="pts-header">
+      <span>积分流水</span>
+      <span style="font-size:12px;color:#999">共 8 条记录</span>
+    </div>
+    <div class="pts-list">
+      <div class="pts-item">
+        <div class="pts-icon" style="background:#d1fae5">🎯</div>
+        <div class="pts-info"><div class="tt">拉新阿姨入驻</div><div class="tm">今天 14:30 · 推荐王阿姨注册</div></div>
+        <div class="pts-val plus">+30</div>
+      </div>
+      <div class="pts-item">
+        <div class="pts-icon" style="background:#dbeafe">⏰</div>
+        <div class="pts-info"><div class="tt">每日打卡签到</div><div class="tm">今天 08:12 · 连续打卡第7天</div></div>
+        <div class="pts-val plus">+5</div>
+      </div>
+      <div class="pts-item">
+        <div class="pts-icon" style="background:#fef3c7">📖</div>
+        <div class="pts-info"><div class="tt">完成第3章学习</div><div class="tm">昨天 20:15 · 月嫂上户必备</div></div>
+        <div class="pts-val plus">+10</div>
+      </div>
+      <div class="pts-item">
+        <div class="pts-icon" style="background:#fce7f3">📚</div>
+        <div class="pts-info"><div class="tt">自习室连续学习3天</div><div class="tm">昨天 · 连续学习奖励</div></div>
+        <div class="pts-val plus">+15</div>
+      </div>
+      <div class="pts-item">
+        <div class="pts-icon" style="background:#d1fae5">🎯</div>
+        <div class="pts-info"><div class="tt">拉新阿姨入驻</div><div class="tm">05-03 09:45 · 推荐刘阿姨注册</div></div>
+        <div class="pts-val plus">+30</div>
+      </div>
+      <div class="pts-item">
+        <div class="pts-icon" style="background:#ffedd5">💳</div>
+        <div class="pts-info"><div class="tt">积分兑换课程</div><div class="tm">04-28 16:00 · 兑换家政技能课</div></div>
+        <div class="pts-val minus">-200</div>
+      </div>
+      <div class="pts-item">
+        <div class="pts-icon" style="background:#dbeafe">⏰</div>
+        <div class="pts-info"><div class="tt">每日打卡签到</div><div class="tm">04-28 07:55 · 连续打卡第3天</div></div>
+        <div class="pts-val plus">+5</div>
+      </div>
+      <div class="pts-item">
+        <div class="pts-icon" style="background:#ede9fe">🎁</div>
+        <div class="pts-info"><div class="tt">新注册奖励</div><div class="tm">04-20 10:00 · 首次注册奖励</div></div>
+        <div class="pts-val plus">+100</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- ================================================
+     推荐阿姨弹窗
+     ================================================ -->
+<div id="referralOverlay" class="confirm-overlay">
+  <div class="confirm-box" style="width:min(340px,90vw)">
+    <div class="cicon">🎯</div>
+    <h3>推荐阿姨入驻</h3>
+    <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px">推荐阿姨入驻，双重奖励：</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <div style="background:#d1fae5;border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:700;color:#07c160">+30</div>
+        <div style="font-size:11px;color:#059669;margin-top:4px">注册即送·自习室积分</div>
+      </div>
+      <div style="background:#fef3c7;border-radius:12px;padding:14px;text-align:center;position:relative">
+        <div style="font-size:22px;font-weight:700;color:#d97706">+¥6</div>
+        <div style="font-size:11px;color:#92400e;margin-top:4px">上户满月·现金红包</div>
+        <span style="position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;font-size:9px;padding:2px 6px;border-radius:8px;font-weight:500">条件</span>
+      </div>
+    </div>
+    <div style="font-size:12px;color:#999;margin-bottom:16px;padding:10px;background:#f5f5f5;border-radius:8px;text-align:left">
+      分享推荐链接给阿姨 → 阿姨注册并完善简历 → <span style="color:#07c160;font-weight:500">您得 +30积分</span><br>
+      阿姨成功上户并工作满一个月 → <span style="color:#d97706;font-weight:500">您再得 ¥6红包</span><br>
+      <span style="color:#07c160;font-weight:500">每日打卡 +5分 · 推荐无限次</span>
+    </div>
+    <div class="confirm-actions" style="flex-direction:column;gap:8px">
+      <button class="confirm-ok" onclick="copyReferralLink()" style="width:100%">📤 分享推荐链接</button>
+      <button style="width:100%;padding:12px;border-radius:10px;border:1px solid #e5e5e5;font-size:14px;font-weight:500;cursor:pointer;background:#fff;color:#666" onclick="showToast('📋 推荐记录')">📋 查看推荐记录</button>
+    </div>
+  </div>
+</div>
+
+  <!-- ================================================
+       个人中心
+       ================================================ -->
+  <div class="page" id="page-profile">
+    <div class="pf-hd">
+      <div class="pf-av">👩‍🍳</div>
+      <div class="pf-nm">王秀英</div>
+      <div class="pf-id">会员ID: 20240315001</div>
+      <div class="pf-bd">
+        <span class="pf-bg">✅ 已实名</span>
+        <span class="pf-bg">🏅 育婴师</span>
+        <span class="pf-bg">⭐ 金牌阿姨</span>
+      </div>
+      <div class="pf-status-card" onclick="showStatusModal()">
+        <span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;flex-shrink:0" id="profileStatusDot"></span>
+        <div style="flex:1;text-align:left">
+          <div style="font-size:11px;color:rgba(255,255,255,.6)">工作状态</div>
+          <div style="font-size:14px;font-weight:500;color:#fff" id="profileStatusText">待岗中 — 可接单</div>
+        </div>
+        <span style="font-size:16px;color:rgba(255,255,255,.4)">›</span>
+      </div>
+    </div>
+    <div class="pf-body">
+      <div class="pf-row">
+        <div class="pf-sc"><div class="pf-sv g">5</div><div class="pf-sl">工作年限</div></div>
+        <div class="pf-sc"><div class="pf-sv o">48</div><div class="pf-sl">已完成订单</div></div>
+        <div class="pf-sc"><div class="pf-sv b">4.9</div><div class="pf-sl">综合评分</div></div>
+      </div>
+      <!-- 简历完善度 -->
+      <div class="resume-progress">
+        <div class="rp-hd"><h4>📄 我的简历</h4><span>80%</span></div>
+        <div class="rp-bar"><div class="fill" style="width:80%"></div></div>
+        <div class="rp-items">
+          <span class="it done">✓ 基本信息</span>
+          <span class="it done">✓ 技能证书</span>
+          <span class="it done">✓ 工作经历</span>
+          <span class="it todo">○ 期望薪资</span>
+          <span class="it todo">○ 工作照片</span>
+        </div>
+        <div style="text-align:center;margin-top:8px"><span style="font-size:11px;color:#07c160;cursor:pointer" onclick="switchPage('ai')">去完善 ›</span></div>
+      </div>
+      <div class="pf-menu">
+        <div class="m-item" onclick="showDetail('resume')"><div class="m-ic g">📄</div><div class="m-tx"><h4>我的简历</h4><p>查看简历 · 审核通过 ✅</p></div><span class="m-ar">›</span></div>
+        <div class="m-item" onclick="showDetail('history')"><div class="m-ic b">📅</div><div class="m-tx"><h4>工作记录</h4><p>48单已完成 · 查看历史订单</p></div><span class="m-bd">3</span><span class="m-ar">›</span></div>
+        <div class="m-item" onclick="switchPage('ai')"><div class="m-ic p">✏️</div><div class="m-tx"><h4>编辑简历</h4><p>AI助手语音录入</p></div><span class="m-ar">›</span></div>
+        <div class="m-item" onclick="showDetail('salary')"><div class="m-ic o">💰</div><div class="m-tx"><h4>工资明细</h4><p>本月已赚 ¥3,250</p></div><span class="m-ar">›</span></div>
+        <div class="m-item" onclick="showDetail('reviews')"><div class="m-ic c">⭐</div><div class="m-tx"><h4>客户评价</h4><p>4.9分 · 查看全部评价</p></div><span class="m-ar">›</span></div>
+        <div class="m-item" onclick="showDetail('settings')"><div class="m-ic r">⚙️</div><div class="m-tx"><h4>设置</h4><p>账号、隐私、消息通知</p></div><span class="m-ar">›</span></div>
+      </div>
+      <!-- 转介绍 -->
+      <div style="margin-top:14px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05)">
+        <div class="m-item" onclick="showReferralModal()">
+          <div class="m-ic g">🎯</div>
+          <div class="m-tx"><h4>推荐阿姨入驻</h4><p>🎁 注册立得+30积分 · 上户满月再得¥6红包</p></div>
+          <span class="m-ar">›</span>
+        </div>
+        <div style="padding:0 16px 12px">
+          <div style="font-size:12px;color:#666;margin-bottom:8px">你推荐的好友</div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <div style="width:36px;height:36px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:#15803d">赵</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:#0369a1">钱</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:#fce7f3;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:#be185d">孙</div>
+            <span style="font-size:11px;color:#07c160;margin-left:auto;cursor:pointer">查看全部 ›</span>
+          </div>
+        </div>
+        <div style="padding:10px 16px;border-top:1px solid #f0f0f0">
+          <button style="width:100%;padding:10px 0;background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer" onclick="showToast('📤 分享推荐码给好友')">📤 分享推荐码给好友</button>
+        </div>
+        <div style="padding:8px 16px 10px;background:#fafafa;font-size:10px;color:#bbb;line-height:1.6">
+          💰 推荐好友签约满一月，你获 <span style="color:#d97706;font-weight:500">¥6</span> 奖励 · 自动发放至平台账户
+        </div>
+      </div>
+    </div>
+    <div class="tabbar">
+      <div class="tab-item" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
+      <div class="tab-item" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
+      <div class="tab-item" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
+      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item act" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
+    </div>
+  </div>
+
+  <!-- ================================================
+       消息通知
+       ================================================ -->
+  <div class="page" id="page-msg">
+    <div class="page-hd"><h2>📬 消息通知</h2></div>
+    <div class="msg-tabs">
+      <div class="msg-t act">全部<span class="tb">3</span></div>
+      <div class="msg-t">岗位<span class="tb">1</span></div>
+      <div class="msg-t">系统</div>
+      <div class="msg-t">AI</div>
+    </div>
+    <div class="msg-body">
+      <div class="msg-i unread" onclick="showInterview()">
+        <div class="msg-ih"><div class="msg-ic jb">🎯</div><div class="msg-it"><h4>面试邀请</h4><span>5分钟前</span></div><div class="msg-dot"></div></div>
+        <div class="msg-c">鹭岛家政邀请您参加【住家保姆】岗位面试，时间：5月8日 14:00，地点：思明区湖滨南路55号</div>
+        <span class="msg-act" onclick="event.stopPropagation();switchPage('apply')">查看详情 →</span>
+      </div>
+      <div class="msg-i unread" onclick="showDetail('resume_ok')">
+        <div class="msg-ih"><div class="msg-ic sy">✅</div><div class="msg-it"><h4>简历审核通过</h4><span>2小时前</span></div><div class="msg-dot"></div></div>
+        <div class="msg-c">您的简历已通过经理审核，现在可以正常应聘岗位了！</div>
+      </div>
+      <div class="msg-i unread" onclick="switchPage('home')">
+        <div class="msg-ih"><div class="msg-ic ai">🤖</div><div class="msg-it"><h4>AI为您推荐新岗位</h4><span>昨天</span></div><div class="msg-dot"></div></div>
+        <div class="msg-c">根据您的技能和偏好，AI为您推荐了3个新岗位，月薪均在¥4,500以上</div>
+        <span class="msg-act" onclick="event.stopPropagation();switchPage('home')">去看看 →</span>
+      </div>
+      <div class="msg-i" onclick="showDetail('salary')">
+        <div class="msg-ih"><div class="msg-ic wg">💰</div><div class="msg-it"><h4>工资结算提醒</h4><span>3天前</span></div></div>
+        <div class="msg-c">4月工资 ¥4,800 已发放，请注意查收</div>
+      </div>
+    </div>
+    <div class="tabbar">
+      <div class="tab-item" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
+      <div class="tab-item" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
+      <div class="tab-item" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
+      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item act" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
+    </div>
+  </div>
+
+  <!-- ===== 岗位详情弹窗 ===== -->
+  <div class="job-modal-overlay" id="jobOverlay" onclick="if(event.target===this)closeJob()"></div>
+  <div class="modal-sheet" id="jobSheet" style="display:none">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeJob()">✕</button>
+    <div class="detail-header">
+      <h2 id="jdTitle">岗位标题</h2>
+      <div class="salary" id="jdSalary"></div>
+      <div class="pub-time">发布时间：2026-05-03 · 长期有效</div>
+    </div>
+    <div class="detail-body">
+      <div class="detail-section">
+        <h4>📋 基本信息</h4>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="l">服务类型</div><div class="v" id="jdType"></div></div>
+          <div class="detail-item"><div class="l">薪资待遇</div><div class="v" id="jdSal2"></div></div>
+          <div class="detail-item"><div class="l">工作区域</div><div class="v" id="jdArea"></div></div>
+          <div class="detail-item"><div class="l">工作时间</div><div class="v" id="jdTime"></div></div>
+          <div class="detail-item"><div class="l">客户要求</div><div class="v" id="jdReq"></div></div>
+          <div class="detail-item"><div class="l">面试方式</div><div class="v" id="jdInt"></div></div>
+        </div>
+      </div>
+      <div class="detail-section">
+        <h4>📝 工作要求</h4>
+        <div class="detail-desc" id="jdDesc"></div>
+      </div>
+      <div class="detail-section">
+        <h4>🏢 公司信息</h4>
+        <div class="detail-desc" id="jdComp"></div>
+      </div>
+    </div>
+    <div class="detail-footer">
+      <button class="btn-secondary" onclick="showToast('📞 联系客户...')">📞 联系客户</button>
+      <button class="btn-primary" onclick="showConfirm('✅','确认应聘','确认应聘该岗位？简历将发送给客户',()=>{closeJob();showToast('✅ 应聘成功！等待审核')})">立即应聘</button>
+    </div>
+  </div>
+
+  <!-- ===== 面试详情弹窗 ===== -->
+  <div class="interview-overlay" id="intOverlay" onclick="if(event.target===this)closeInterview()"></div>
+  <div class="interview-sheet" id="intSheet" style="display:none">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeInterview()">✕</button>
+    <div style="padding:16px 20px;border-bottom:1px solid #f0f0f0">
+      <h3 style="font-size:17px;font-weight:600;color:#333;margin-bottom:4px">🎯 面试详情</h3>
+      <p style="font-size:13px;color:#999">【住家保姆】三室一厅 · 鹭岛家政</p>
+    </div>
+    <div class="isec">
+      <h4>📅 面试安排</h4>
+      <div class="intel-item"><span>面试时间</span><span class="v">2026年5月8日 14:00</span></div>
+      <div class="intel-item"><span>面试地点</span><span class="v">思明区湖滨南路55号</span></div>
+      <div class="intel-item"><span>面试官</span><span class="v">张经理 · 186****1234</span></div>
+      <div class="intel-item"><span>所需材料</span><span class="v">身份证、健康证</span></div>
+    </div>
+    <div class="isec">
+      <h4>📍 面试地址</h4>
+      <div class="intel-map">🗺️ 地图 · 思明区湖滨南路55号</div>
+    </div>
+    <div class="isec">
+      <h4>📝 面试提示</h4>
+      <div style="font-size:13px;color:#666;line-height:1.8">
+        • 请提前10分钟到达<br>• 穿着整洁大方<br>• 带好相关证件原件<br>• 可提前了解客户家庭情况
+      </div>
+    </div>
+    <div class="intel-actions">
+      <button class="call" onclick="closeInterview();showToast('📞 正在拨打 张经理...')">📞 联系面试官</button>
+      <button class="nav" onclick="closeInterview();showToast('🗺️ 正在打开导航...')">🗺️ 导航前往</button>
+    </div>
+  </div>
+
+  <!-- ===== 确认弹窗 ===== -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <div class="cicon" id="confirmIcon">✅</div>
+      <h3 id="confirmTitle">确认操作</h3>
+      <p id="confirmDesc">确认执行该操作？</p>
+      <div class="confirm-actions">
+        <button class="confirm-cancel" onclick="closeConfirm()">取消</button>
+        <button class="confirm-ok" id="confirmBtn" onclick="doConfirm()">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 详情面板 ===== -->
+  <div class="status-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+    <div class="status-sheet" style="padding:0 20px 20px">
+      <div class="status-handle"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h3 style="font-size:17px;font-weight:600;color:#1a1a2e" id="detailTitle">详情</h3>
+        <span style="font-size:18px;color:#999;cursor:pointer" onclick="closeDetail()">✕</span>
+      </div>
+      <div id="detailContent" style="max-height:60vh;overflow-y:auto"></div>
+    </div>
+  </div>
+
+  <!-- ===== 状态切换弹窗 ===== -->
+  <div class="status-overlay" id="statusOverlay">
+    <div class="status-sheet">
+      <div class="status-handle"></div>
+      <div class="status-title">设置工作状态</div>
+      <div class="status-desc">更新后家政经理和匹配算法将据此为你推荐岗位</div>
+      <div class="status-options">
+        <div class="status-opt active" data-status="available" onclick="setStatus('available')">
+          <span class="status-opt-icon" style="background:#f59e0b;color:#fff">🟢</span>
+          <div class="status-opt-info">
+            <div class="status-opt-name" style="color:#92400e">待岗中</div>
+            <div class="status-opt-desc" style="color:#b45309">可接新岗位 · 系统将为你推荐合适工作</div>
+          </div>
+          <span class="status-opt-check" style="color:#92400e" id="check-available">✓ 当前</span>
+        </div>
+        <div class="status-opt inactive" data-status="working" onclick="setStatus('working')">
+          <span class="status-opt-icon" style="background:#3b82f6;color:#fff">🔵</span>
+          <div class="status-opt-info">
+            <div class="status-opt-name">上户中</div>
+            <div class="status-opt-desc">已有雇主 · 暂不接收新岗位推荐</div>
+          </div>
+          <span class="status-opt-check" style="color:#3b82f6;display:none" id="check-working">✓ 当前</span>
+        </div>
+        <div class="status-opt inactive" data-status="quit" onclick="setStatus('quit')">
+          <span class="status-opt-icon" style="background:#6b7280;color:#fff">⚫</span>
+          <div class="status-opt-info">
+            <div class="status-opt-name">已转行</div>
+            <div class="status-opt-desc">不再从事家政行业 · 简历将被隐藏</div>
+          </div>
+          <span class="status-opt-check" style="color:#6b7280;display:none" id="check-quit">✓ 当前</span>
+        </div>
+      </div>
+      <button class="status-cancel" onclick="closeStatusModal()">取消</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== 页面路由 =====
+const pages = ['home','apply','ai','study','clock','profile','msg','course-detail','points'];
+function switchPage(id) {
+  // 切换页面
+  document.querySelectorAll('.page').forEach(function(p){
+    p.classList.remove('active');
+  });
+  document.getElementById('page-'+id).classList.add('active');
+  // 隐藏/显示tabbar
+  var noTabPages = ['course-detail','points'];
+  var tabbars = document.querySelectorAll('.tabbar');
+  if(noTabPages.indexOf(id) >= 0){
+    tabbars.forEach(function(t){t.style.display='none';});
+  } else {
+    tabbars.forEach(function(t){t.style.display='flex';});
+  }
+  // Tabbar高亮（兼容无data-page的静态tabbar）
+  document.querySelectorAll('.tab-item').forEach(function(t){
+    var dp = t.getAttribute('data-page');
+    if(dp) t.classList.toggle('act', dp===id);
+  });
+  window.scrollTo(0,0);
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+
+// ===== 岗位分类筛选 =====
+var _activeFilter = '';
+function filterJobs(kw){
+  var items = document.querySelectorAll('#page-home .cat-item');
+  // Toggle: click same category to deselect
+  if(_activeFilter === kw){ kw = ''; }
+  _activeFilter = kw;
+  items.forEach(function(item){
+    item.classList.toggle('act', item.querySelector('.cat-lb') && (
+      (kw==='小孩' && item.querySelector('.cat-lb').textContent==='带小孩') ||
+      (kw==='老人' && item.querySelector('.cat-lb').textContent==='照顾老人') ||
+      (kw==='做饭' && item.querySelector('.cat-lb').textContent==='做饭') ||
+      (kw==='保洁' && item.querySelector('.cat-lb').textContent==='保洁')
+    ));
+  });
+  var cards = document.querySelectorAll('#jobList .job-c');
+  var visible = 0;
+  cards.forEach(function(c){
+    if(!kw){ c.style.display=''; visible++; }
+    else { var txt=c.textContent; if(txt.indexOf(kw)>=0){ c.style.display=''; visible++; } else { c.style.display='none'; } }
+  });
+  document.getElementById('jobEmpty').style.display = (kw && visible===0) ? 'block' : 'none';
+}
+
+// ===== 首页搜索 =====
+function toggleSearch(){
+  var bar = document.getElementById('searchBar');
+  var is = bar.style.display === 'block';
+  bar.style.display = is ? 'none' : 'block';
+  if(!is) bar.querySelector('input').focus();
+}
+function closeSearch(){
+  var bar = document.getElementById('searchBar');
+  bar.style.display = 'none';
+  bar.querySelector('input').value = '';
+  searchJobs('');
+}
+function searchJobs(val){
+  var kw = val.trim().toLowerCase();
+  document.querySelectorAll('#jobList .job-c').forEach(function(c){
+    c.style.display = !kw || c.textContent.toLowerCase().indexOf(kw)>=0 ? '' : 'none';
+  });
+}
+
+// ===== 确认弹窗 =====
+let _cb = null;
+function showConfirm(icon, title, desc, cb, btnText) {
+  document.getElementById('confirmIcon').textContent = icon;
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmDesc').textContent = desc;
+  document.getElementById('confirmBtn').textContent = btnText || '确认';
+  _cb = cb;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('show');
+  _cb = null;
+}
+function doConfirm() {
+  if (_cb) _cb();
+  closeConfirm();
+}
+
+// ===== 岗位详情 =====
+const jobs = [
+  {title:'【住家保姆】三室一厅 照顾1岁宝宝',salary:'¥6,000/月',type:'住家保姆',area:'五缘湾',time:'做六休一',req:'有育婴师证',interview:'现场面试',desc:'照顾1岁宝宝，负责宝宝饮食起居、早教互动；日常家庭保洁、三餐制作。要求有带娃经验，有耐心，身体健康。',comp:'厦门鹭岛家政服务有限公司 · 成立8年 · 服务家庭超2000户'},
+  {title:'【白班保姆】四室两厅 日常保洁',salary:'¥4,500/月',type:'白班保姆',area:'思明区',time:'08:00-17:00',req:'有健康证',interview:'视频面试',desc:'日常家庭保洁、衣物整理、三餐制作。客户为两口之家，200平米大平层。要求细心负责，会做闽南菜优先。',comp:'好阿姨平台 · O2O家政服务平台'},
+  {title:'【钟点工】每天2小时 买菜做饭',salary:'¥2,800/月',type:'钟点工',area:'思明区',time:'16:00-18:00',req:'擅长做饭',interview:'电话面试',desc:'每天下午去客户家买菜做饭，2菜1汤标准。客户是两位退休老人，口味偏清淡。要求会做家常菜，干净卫生。',comp:'熊猫家政 · 厦门本地家政品牌'}
+];
+function showJobDetail(idx) {
+  const j = jobs[idx];
+  document.getElementById('jdTitle').textContent = j.title;
+  document.getElementById('jdSalary').textContent = j.salary;
+  document.getElementById('jdSal2').textContent = j.salary;
+  document.getElementById('jdType').textContent = j.type;
+  document.getElementById('jdArea').textContent = j.area;
+  document.getElementById('jdTime').textContent = j.time;
+  document.getElementById('jdReq').textContent = j.req;
+  document.getElementById('jdInt').textContent = j.interview;
+  document.getElementById('jdDesc').textContent = j.desc;
+  document.getElementById('jdComp').textContent = j.comp;
+  document.getElementById('jobOverlay').classList.add('show');
+  document.getElementById('jobSheet').style.display = 'block';
+}
+function closeJob() {
+  document.getElementById('jobOverlay').classList.remove('show');
+  document.getElementById('jobSheet').style.display = 'none';
+}
+
+// ===== 面试详情 =====
+function showInterview() {
+  document.getElementById('intOverlay').classList.add('show');
+  document.getElementById('intSheet').style.display = 'block';
+}
+function closeInterview() {
+  document.getElementById('intOverlay').classList.remove('show');
+  document.getElementById('intSheet').style.display = 'none';
+}
+
+// ===== 语音录入 =====
+function toggleVoice() {
+  const btn = document.getElementById('voiceBtn');
+  const isRec = btn.classList.contains('rec');
+  if (!isRec) {
+    btn.classList.add('rec'); btn.textContent = '⏹';
+    showToast('🎤 开始录音...请说话');
+    setTimeout(() => {
+      btn.classList.remove('rec'); btn.textContent = '🎤';
+      showToast('✅ 语音识别完成');
+    }, 3000);
+  } else {
+    btn.classList.remove('rec'); btn.textContent = '🎤';
+  }
+}
+
+// ===== 发送消息 =====
+function sendMsg(el) {
+  showToast('💬 ' + el.textContent);
+}
+function sendText() {
+  const inp = document.getElementById('chatInput');
+  if (inp.value.trim()) {
+    showToast('📤 已发送: ' + inp.value);
+    inp.value = '';
+  }
+}
+
+// ===== 筛选栏 =====
+document.querySelectorAll('.filter-bar').forEach(bar => {
+  bar.querySelectorAll('.f-item').forEach(item => {
+    item.addEventListener('click', function() {
+      bar.querySelectorAll('.f-item').forEach(i => i.classList.remove('act'));
+      this.classList.add('act');
+    });
+  });
+});
+
+// ===== 消息Tab =====
+document.querySelectorAll('.msg-tabs .msg-t').forEach(t => {
+  t.addEventListener('click', function() {
+    document.querySelectorAll('.msg-tabs .msg-t').forEach(i => i.classList.remove('act'));
+    this.classList.add('act');
+  });
+});
+
+// ===== 实时时钟 =====
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const timeStr = h + ':' + m;
+  document.querySelectorAll('#livetime,#livetime2').forEach(el => el.textContent = timeStr);
+  const el = document.getElementById('clockTime');
+  if (el) el.textContent = timeStr;
+  const days = ['日','一','二','三','四','五','六'];
+  const dateEl = document.getElementById('clockDate');
+  if (dateEl) {
+    dateEl.textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 · 星期${days[now.getDay()]}`;
+  }
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+// ===== 工作状态管理 =====
+let currentStatus = 'available';
+const statusMap = {
+  available: { dot: '#f59e0b', home: '当前状态：待岗中', profile: '待岗中 — 可接单', check: 'check-available' },
+  working: { dot: '#3b82f6', home: '当前状态：上户中', profile: '上户中 — 已有雇主', check: 'check-working' },
+  quit: { dot: '#6b7280', home: '当前状态：已转行', profile: '已转行 — 不再接单', check: 'check-quit' }
+};
+
+// 初始化同步状态
+setStatus('available');
+
+function showStatusModal() {
+  document.getElementById('statusOverlay').classList.add('show');
+}
+function closeStatusModal() {
+  document.getElementById('statusOverlay').classList.remove('show');
+}
+function setStatus(status) {
+  const s = statusMap[status];
+  if (!s) return;
+
+  // Update UI elements
+  document.getElementById('homeStatusDot').style.background = s.dot;
+  document.getElementById('homeStatusText').textContent = s.home;
+  document.getElementById('profileStatusDot').style.background = s.dot;
+  document.getElementById('profileStatusText').textContent = s.profile;
+
+  // Update modal option states
+  document.querySelectorAll('.status-opt').forEach(opt => {
+    opt.classList.remove('active');
+    opt.classList.add('inactive');
+  });
+  document.querySelector(`[data-status="${status}"]`).classList.add('active');
+  document.querySelector(`[data-status="${status}"]`).classList.remove('inactive');
+
+  document.querySelectorAll('.status-opt-check').forEach(el => el.style.display = 'none');
+  document.getElementById(s.check).style.display = 'inline';
+
+  currentStatus = status;
+
+  // Update home header background based on status
+  const hd = document.querySelector('#page-home .home-hd');
+  if (status === 'available') {
+    hd.style.background = 'linear-gradient(135deg,#07c160,#10b980)';
+    document.getElementById('statusTip').style.display = 'flex';
+    document.getElementById('jobList').style.display = 'block';
+    document.getElementById('statusPlaceholder').style.display = 'none';
+  } else if (status === 'working') {
+    hd.style.background = 'linear-gradient(135deg,#3b82f6,#2563eb)';
+    document.getElementById('statusTip').style.display = 'none';
+    document.getElementById('jobList').style.display = 'none';
+    document.getElementById('statusPlaceholder').style.display = 'block';
+    document.getElementById('statusIcon').textContent = '🔵';
+    document.getElementById('statusTitle').textContent = '您当前正在上户中';
+    document.getElementById('statusDesc').textContent = '您已有关联雇主，暂不推荐新岗位。如需查看历史岗位，请切换工作状态。';
+  } else {
+    hd.style.background = 'linear-gradient(135deg,#6b7280,#4b5563)';
+    document.getElementById('statusTip').style.display = 'none';
+    document.getElementById('jobList').style.display = 'none';
+    document.getElementById('statusPlaceholder').style.display = 'block';
+    document.getElementById('statusIcon').textContent = '⚫';
+    document.getElementById('statusTitle').textContent = '您已修改为「已转行」';
+    document.getElementById('statusDesc').textContent = '您已选择不再从事家政行业，岗位推荐已暂停。如需重新接单，请更新工作状态为「待岗中」。';
+  }
+
+  showToast('✅ 状态已更新为' + statusMap[status].home.replace('当前状态：',''));
+  closeStatusModal();
+}
+
+// ===== 详情面板 =====
+var DETAIL_CONTENT = {
+  resume: '<div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:12px"><div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:10px">📋 基本信息</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px"><div><span style="color:#999">姓名：</span>王秀英</div><div><span style="color:#999">年龄：</span>38岁</div><div><span style="color:#999">工种：</span>育婴师/育儿嫂</div><div><span style="color:#999">经验：</span>5年</div><div><span style="color:#999">籍贯：</span>四川成都</div><div><span style="color:#999">学历：</span>高中</div></div></div><div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:12px"><div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:10px">📜 证书资质</div><div style="display:flex;flex-wrap:wrap;gap:6px"><span style="padding:4px 10px;background:#dcfce7;color:#15803d;border-radius:6px;font-size:11px">✅ 育婴师证</span><span style="padding:4px 10px;background:#dcfce7;color:#15803d;border-radius:6px;font-size:11px">✅ 健康证</span><span style="padding:4px 10px;background:#dcfce7;color:#15803d;border-radius:6px;font-size:11px">✅ 催乳师证</span></div></div><div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:12px"><div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:10px">📝 审核状态</div><div style="display:flex;align-items:center;gap:8px"><span style="padding:4px 10px;background:#dcfce7;color:#15803d;border-radius:6px;font-size:12px">✅ 已通过审核</span><span style="font-size:11px;color:#999">审核时间：2026-05-01</span></div></div>',
+  resume_ok: '<div style="text-align:center;padding:20px 0"><div style="font-size:48px;margin-bottom:12px">✅</div><div style="font-size:16px;font-weight:600;color:#059669;margin-bottom:8px">简历审核已通过</div><div style="font-size:13px;color:#666;line-height:1.8">您的简历已通过熊猫家政经理审核<br>现在可以正常应聘岗位了<br><br>审核时间：2026-05-08 10:35</div></div>',
+  history: '<div style="display:flex;flex-direction:column;gap:10px"><div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:500;color:#1a1a2e">育儿嫂 · 带1岁宝宝</span><span style="font-size:11px;color:#059669">已完成</span></div><div style="font-size:11px;color:#999;margin:4px 0">2026年3月 - 4月 · 白班 · 武侯区</div><div style="font-size:12px;color:#d97706;font-weight:500">¥5,500/月</div></div><div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:500;color:#1a1a2e">月嫂 · 26天住家</span><span style="font-size:11px;color:#059669">已完成</span></div><div style="font-size:11px;color:#999;margin:4px 0">2025年12月 · 住家 · 锦江区</div><div style="font-size:12px;color:#d97706;font-weight:500">¥8,800/26天</div></div><div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:500;color:#1a1a2e">育儿嫂 · 带6个月双胞胎</span><span style="font-size:11px;color:#059669">已完成</span></div><div style="font-size:11px;color:#999;margin:4px 0">2025年8月 - 10月 · 住家 · 武侯区</div><div style="font-size:12px;color:#d97706;font-weight:500">¥7,000/月</div></div></div>',
+  salary: '<div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;color:#666">本月收入</span><span style="font-size:20px;font-weight:700;color:#d97706">¥3,250</span></div><div style="height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden"><div style="width:65%;height:100%;background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div><div style="font-size:10px;color:#999;margin-top:4px">预计本月 ¥5,000 · 已完成65%</div></div><div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:12"><div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:8px">📅 最近收入</div><div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>4月 · 育儿嫂</span><span style="color:#d97706">¥5,500</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span>3月 · 育儿嫂</span><span style="color:#d97706">¥5,500</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span>2月 · 休整</span><span style="color:#999">—</span></div></div></div>',
+  reviews: '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><div style="font-size:32px;font-weight:700;color:#d97706">4.9</div><div><div style="font-size:12px;color:#666">⭐⭐⭐⭐⭐</div><div style="font-size:11px;color:#999">共 48 条评价</div></div></div><div style="display:flex;flex-direction:column;gap:10px"><div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:13px;font-weight:500;color:#1a1a2e">张女士</span><span style="font-size:11px;color:#d97706">⭐⭐⭐⭐⭐</span></div><div style="font-size:12px;color:#666;line-height:1.6">阿姨非常细心，带宝宝特别有耐心，我出差期间完全放心。强烈推荐！</div><div style="font-size:10px;color:#bbb;margin-top:4px">2026年4月 · 育儿嫂</div></div><div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:13px;font-weight:500;color:#1a1a2e">李女士</span><span style="font-size:11px;color:#d97706">⭐⭐⭐⭐⭐</span></div><div style="font-size:12px;color:#666;line-height:1.6">月嫂经验丰富，月子餐做得好，晚上也会帮忙带宝宝让我休息好。</div><div style="font-size:10px;color:#bbb;margin-top:4px">2025年12月 · 月嫂</div></div></div>',
+  settings: '<div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="showToast(\'隐私设置\')"><span style="font-size:14px;color:#333">🔒 隐私设置</span><span style="font-size:12px;color:#999">谁可以看到我的简历 ›</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="showToast(\'消息通知\')"><span style="font-size:14px;color:#333">🔔 消息通知</span><span style="font-size:12px;color:#999">推送、短信、电话 ›</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="showToast(\'账号安全\')"><span style="font-size:14px;color:#333">🛡️ 账号安全</span><span style="font-size:12px;color:#999">修改密码 · 注销账户 ›</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="showToast(\'关于熊猫家政\')"><span style="font-size:14px;color:#333">ℹ️ 关于</span><span style="font-size:12px;color:#999">版本 1.0.0 ›</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;cursor:pointer" onclick="showConfirm(\'⚠️\',\'退出登录\',\'确认退出当前账号？\',()=>showToast(\'已退出登录\'))"><span style="font-size:14px;color:#ef4444">退出登录</span><span style="font-size:12px;color:#999">›</span></div></div>'
+};
+function showDetail(type){
+  var titles = {resume:'📄 我的简历',resume_ok:'📄 简历审核',history:'📅 工作记录',salary:'💰 工资明细',reviews:'⭐ 客户评价',settings:'⚙️ 设置'};
+  document.getElementById('detailTitle').textContent = titles[type] || '详情';
+  document.getElementById('detailContent').innerHTML = DETAIL_CONTENT[type] || '';
+  document.getElementById('detailOverlay').classList.add('show');
+}
+function closeDetail(){
+  document.getElementById('detailOverlay').classList.remove('show');
+}
+
+// ===== 课程数据 =====
+var COURSE_DATA = [
+  {
+    name: '月嫂上户必备91项技能',
+    subtitle: '共48节课 · 含实训视频',
+    price: '¥980',
+    points: '980积分兑换',
+    totalLessons: 48,
+    doneLessons: 17,
+    totalHours: '36h',
+    hasCert: true,
+    progress: 35,
+    bg: 'linear-gradient(135deg,#1e40af,#3b82f6)',
+    sections: [
+      { title: '第一章：月嫂职业素养', sub: '职业礼仪 · 职业道德 · 法律法规', lessons: 3, status: 'done', free: true },
+      { title: '第二章：产妇护理基础', sub: '产后恢复 · 伤口护理 · 营养餐', lessons: 5, status: 'done', free: false },
+      { title: '第三章：新生儿护理', sub: '洗澡 · 抚触 · 脐带护理 · 黄疸观察', lessons: 6, status: 'current', free: false },
+      { title: '第四章：母乳喂养指导', sub: '哺乳姿势 · 追奶 · 乳腺炎预防', lessons: 4, status: 'locked', free: false },
+      { title: '第五章：婴幼儿常见病护理', sub: '发热处理 · 腹泻护理 · 湿疹护理', lessons: 6, status: 'locked', free: false },
+      { title: '第六章：月子餐制作', sub: '分阶段食谱 · 营养搭配 · 实操', lessons: 5, status: 'locked', free: false },
+      { title: '第七章：实操考核与证书', sub: '模拟考核 · 证书报考指引', lessons: 6, status: 'locked', free: false }
+    ]
+  },
+  {
+    name: '高级育婴师',
+    subtitle: '共36节课 · 含实操演示',
+    price: '¥980',
+    points: '980积分兑换',
+    totalLessons: 36,
+    doneLessons: 0,
+    totalHours: '28h',
+    hasCert: true,
+    progress: 0,
+    bg: 'linear-gradient(135deg,#9333ea,#7c3aed)',
+    sections: [
+      { title: '第一章：婴幼儿发展心理学', sub: '认知发展 · 情感发展 · 敏感期', lessons: 4, status: 'locked', free: true },
+      { title: '第二章：辅食添加与营养', sub: '分阶段辅食 · 过敏预防 · 食谱', lessons: 5, status: 'locked', free: false },
+      { title: '第三章：早期教育方法', sub: '感统训练 · 语言启蒙 · 音乐律动', lessons: 6, status: 'locked', free: false },
+      { title: '第四章：安全与急救', sub: '家庭安全 · 意外处理 · 海姆立克', lessons: 4, status: 'locked', free: false },
+      { title: '第五章：实操考核', sub: '技能操作 · 笔试 · 证书报考', lessons: 5, status: 'locked', free: false }
+    ]
+  },
+  {
+    name: '高级催乳师',
+    subtitle: '共42节课 · 含手法视频',
+    price: '¥980',
+    points: '980积分兑换',
+    totalLessons: 42,
+    doneLessons: 0,
+    totalHours: '32h',
+    hasCert: true,
+    progress: 0,
+    bg: 'linear-gradient(135deg,#059669,#10b981)',
+    sections: [
+      { title: '第一章：乳房解剖与生理', sub: '乳房结构 · 泌乳原理 · 常见问题', lessons: 5, status: 'locked', free: true },
+      { title: '第二章：催乳手法基础', sub: '按摩手法 · 穴位识别 · 实操练习', lessons: 6, status: 'locked', free: false },
+      { title: '第三章：产后开奶与追奶', sub: '开奶技巧 · 追奶方案 · 饮食调理', lessons: 6, status: 'locked', free: false },
+      { title: '第四章：乳腺炎护理', sub: '预防 · 早期处理 · 手法排奶', lessons: 5, status: 'locked', free: false },
+      { title: '第五章：回奶与断奶', sub: '自然回奶 · 渐进断奶 · 注意事项', lessons: 4, status: 'locked', free: false },
+      { title: '第六章：实操考核与证书', sub: '手法考核 · 理论考核 · 证书报考', lessons: 4, status: 'locked', free: false }
+    ]
+  }
+];
+
+// ===== 课程详情函数 =====
+function showCourseDetail(idx) {
+  if(idx < 0 || idx >= COURSE_DATA.length) return;
+  var c = COURSE_DATA[idx];
+  // 填充数据
+  document.getElementById('courseTitle').textContent = c.name;
+  document.getElementById('courseSub').textContent = c.subtitle;
+  document.getElementById('courseDetailTitle').textContent = c.name;
+  document.getElementById('coursePrice').textContent = c.price;
+  document.getElementById('coursePoints').textContent = '或 ' + c.points;
+  document.getElementById('courseBg').style.background = c.bg;
+  document.getElementById('ciLessons').textContent = c.totalLessons;
+  document.getElementById('ciDone').textContent = c.doneLessons;
+  document.getElementById('ciHours').textContent = c.totalHours;
+  document.getElementById('ciCert').textContent = c.hasCert ? '✓' : '—';
+  document.getElementById('coursePct').textContent = c.progress + '%';
+  document.getElementById('courseProgressBar').style.width = c.progress + '%';
+  // 渲染目录
+  var listHtml = '';
+  c.sections.forEach(function(s, i){
+    var idxClass = '';
+    var idxContent = '';
+    if(s.status === 'done') { idxClass = 'done'; idxContent = '✓'; }
+    else if(s.status === 'current') { idxClass = 'cur'; idxContent = (i+1); }
+    else { idxContent = (i+1); }
+    var freeTag = s.free ? '<span class="status-tag free">免费</span>' : '';
+    listHtml += '<div class="sec-item">' +
+      '<div class="idx ' + idxClass + '">' + idxContent + '</div>' +
+      '<div class="info"><div class="tt">' + s.title + '</div><div class="sub">' + s.sub + '</div></div>' +
+      '<div class="dur">' + s.lessons + '节</div>' +
+      freeTag +
+      '</div>';
+  });
+  document.getElementById('courseSectionList').innerHTML = listHtml;
+  switchPage('course-detail');
+}
+
+// ===== 推荐阿姨弹窗 =====
+function showReferralModal(){
+  document.getElementById('referralOverlay').classList.add('show');
+}
+function copyReferralLink(){
+  // 模拟复制
+  showToast('✅ 推荐链接已复制！分享给阿姨注册双方得奖励');
+  setTimeout(function(){
+    document.getElementById('referralOverlay').classList.remove('show');
+  }, 1000);
+}
+// 关闭推荐弹窗（点背景）
+document.addEventListener('click', function(e){
+  var overlay = document.getElementById('referralOverlay');
+  if(e.target === overlay) overlay.classList.remove('show');
+});
+// ===== AI简历助手 =====
+function quickReply(el){
+  var p = el.parentElement.parentElement;
+  // 模拟用户回复：将所选内容填入输入框下方
+  var text = el.textContent;
+  el.style.background='#eef2ff';
+  el.style.color='#4f46e5';
+  el.style.borderColor='#c7d2fe';
+  el.style.fontWeight='500';
+  setTimeout(function(){showToast('✅ 已选择：' + text)},300);
+}
+function sendAiMsg(){
+  var input = document.querySelector('#page-ai input');
+  var text = input.value.trim();
+  if(!text) { showToast('请输入内容或点击语音'); return; }
+  // 添加用户消息
+  var chat = document.getElementById('aiChat');
+  var bubble = document.createElement('div');
+  bubble.style.cssText = 'display:flex;gap:8px;align-items:flex-start;flex-direction:row-reverse;animation:fadeIn .3s';
+  bubble.innerHTML = '<div style="width:28px;height:28px;background:#e0e7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#4f46e5;font-size:13px;flex-shrink:0">我</div><div style="max-width:85%"><div style="background:#eef2ff;padding:10px 14px;border-radius:14px 14px 4px 14px;font-size:13px;color:#333;line-height:1.6">'+text+'</div></div>';
+  chat.appendChild(bubble);
+  input.value='';
+  chat.scrollTop=chat.scrollHeight;
+  // 模拟AI回复
+  setTimeout(function(){
+    var aiBubble = document.createElement('div');
+    aiBubble.style.cssText = 'display:flex;gap:8px;align-items:flex-start;animation:fadeIn .3s';
+    aiBubble.innerHTML = '<div style="width:28px;height:28px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0">AI</div><div style="max-width:85%"><div style="background:#fff;padding:10px 14px;border-radius:14px 14px 14px 4px;font-size:13px;color:#333;line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,.05)">收到！正在为您整理... 还有其他要补充的吗？</div></div>';
+    chat.appendChild(aiBubble);
+    chat.scrollTop=chat.scrollHeight;
+  },800);
+}
+function previewResume(){
+  showToast('📋 简历预览即将上线，敬请期待');
+}
+</script>
+</body>
+</html>
