@@ -1,0 +1,2289 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>熊猫家政 · 家政经理</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;min-height:100vh;background:#f5f7fa;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif;color:#333}
+#app{max-width:480px;margin:0 auto;padding:0;position:relative}
+.page{display:none;padding:0 16px 24px}
+.page.active{display:block}
+
+/* ===== 看板 ===== */
+.header{display:flex;justify-content:space-between;align-items:center;padding:16px 0 12px}
+.header-left h1{font-size:20px;font-weight:600;color:#1a1a2e}
+.header-left p{font-size:12px;color:#999;margin-top:2px}
+.header-right{display:flex;gap:12px;font-size:12px;color:#999}
+.quick-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.quick-btn{border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;transition:transform .15s}
+.quick-btn:active{transform:scale(0.97)}
+.quick-btn .label{font-size:14px;font-weight:600;margin-bottom:4px}
+.quick-btn .sub{font-size:11px;opacity:.65}
+.quick-btn.blue{background:#eef2ff;border:1px solid #c7d2fe;color:#4f46e5}
+.quick-btn.green{background:#ecfdf5;border:1px solid #a7f3d0;color:#059669}
+.quick-btn.gray{background:#f8fafc;border:1px solid #e2e8f0;color:#334155}
+.quick-btn.amber{background:#fffbeb;border:1px solid #fde68a;color:#d97706}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+.stat-card{background:#fff;border-radius:12px;padding:16px;border:1px solid #f0f0f0;cursor:pointer}
+.stat-card .label{font-size:12px;color:#999;margin-bottom:4px}
+.stat-card .num{font-size:28px;font-weight:700;margin-bottom:4px}
+.stat-card .extra{font-size:11px;color:#bbb}
+.stat-card.bd-blue{border-color:#c7d2fe}
+.stat-card.bd-blue .num{color:#4f46e5}
+.stat-card.bd-green{border-color:#a7f3d0}
+.stat-card.bd-green .num{color:#059669}
+
+/* ===== 增值服务 ===== */
+.svc-section{margin-bottom:16px}
+.svc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.svc-header .tit{font-size:14px;font-weight:500;color:#1a1a2e}
+.svc-header .all{font-size:12px;color:#999;cursor:pointer}
+.svc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.svc-item{text-align:center;padding:10px 2px;background:#f8fafc;border-radius:10px;cursor:pointer}
+.svc-item:active{background:#eef2ff}
+.svc-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;margin:0 auto 4px}
+.svc-label{font-size:10px;color:#333;font-weight:500}
+
+/* ===== 待办 ===== */
+.section-title{font-size:15px;font-weight:600;color:#1a1a2e;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title .b{font-size:12px;font-weight:400;color:#999}
+.todo-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.todo-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-radius:10px;border:1px solid #f0f0f0}
+.td{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.td.r{background:#ef4444}.td.a{background:#f59e0b}.td.b{background:#3b82f6}.td.g{background:#d1d5db}
+.td-t{flex:1;font-size:13px;line-height:1.4}
+.td-btn{flex-shrink:0;padding:5px 12px;border-radius:6px;font-size:12px;color:#4f46e5;background:#eef2ff;border:none;cursor:pointer;font-weight:500}
+
+/* ===== CRM通用 ===== */
+.page-header{display:flex;justify-content:space-between;align-items:center;padding:14px 0 10px}
+.page-header .tit{font-size:16px;font-weight:600;color:#1a1a2e;cursor:pointer}
+.page-header .act{display:flex;gap:12px;font-size:12px}
+.page-header .act span{cursor:pointer}
+.status-tabs{display:flex;gap:8px;overflow-x:auto;white-space:nowrap;margin-bottom:12px}
+.stab{padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;background:#f8fafc;color:#999;flex-shrink:0}
+.stab.on{background:#eef2ff;color:#4f46e5;font-weight:500}
+.search-bar input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;font-size:13px;background:#f8fafc;outline:none;margin-bottom:12px}
+.cust-list{display:flex;flex-direction:column;gap:10px}
+.cust-card{background:#fff;border-radius:12px;border:1px solid #f0f0f0;overflow:hidden}
+.cust-card .bd{padding:12px 16px}
+.cust-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cust-avatar{display:flex;align-items:center;gap:8px}
+.cust-avatar .av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500}
+.cust-avatar .nm{font-size:14px;font-weight:500;color:#1a1a2e}
+.cust-avatar .ph{font-size:11px;color:#bbb}
+.cust-tags{display:flex;gap:4px}
+.tag{padding:2px 8px;border-radius:4px;font-size:10px}
+.tag.danger{background:#fef2f2;color:#ef4444;font-weight:500}
+.tag.warn{background:#fffbeb;color:#d97706;font-weight:500}
+.tag.ok{background:#ecfdf5;color:#059669;font-weight:500}
+.tag.gray{background:#f8fafc;color:#999}
+.tag.info{background:#eef2ff;color:#4f46e5}
+.tag.red{background:#fee2e2;color:#dc2626;font-weight:500}
+.cust-info{display:flex;gap:16px;font-size:12px;color:#666;margin-bottom:10px;flex-wrap:wrap}
+.cust-ops{display:flex;gap:8px;border-top:1px solid #f0f0f0;padding-top:10px}
+.cust-ops button{flex:1;padding:6px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer}
+.btn-info{background:#eef2ff;color:#4f46e5}
+.btn-ok{background:#ecfdf5;color:#059669}
+.btn-gray{background:#f8fafc;color:#666}
+.btn-warn{background:#fef3c7;color:#d97706}
+.btn-danger{background:#fee2e2;color:#dc2626}
+.detail-header{display:flex;align-items:center;gap:12px;padding:12px 0}
+.detail-header .av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:500}
+.detail-header .nm{font-size:16px;font-weight:500;color:#1a1a2e}
+.detail-header .ph{font-size:13px;color:#666;margin-top:2px}
+.detail-header .ops{display:flex;gap:8px;margin-left:auto}
+.info-bar{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#666;padding:8px 0 12px;border-bottom:1px solid #f0f0f0}
+.info-bar .l{color:#bbb}
+.detail-tabs{display:flex;border-bottom:1px solid #f0f0f0;overflow-x:auto}
+.detail-tabs div{text-align:center;padding:12px 10px;font-size:12px;cursor:pointer;color:#999;white-space:nowrap}
+.detail-tabs div.on{color:#4f46e5;font-weight:500;border-bottom:2px solid #4f46e5}
+.follow-list{padding:12px 0;display:flex;flex-direction:column;gap:12px;min-height:200px}
+.fl-item{display:flex;gap:10px}
+.fl-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.fl-top{display:flex;justify-content:space-between}
+.fl-name{font-size:12px;font-weight:500;color:#1a1a2e}
+.fl-time{font-size:11px;color:#bbb}
+.fl-text{font-size:12px;color:#666;margin:4px 0;line-height:1.5}
+.fl-way{padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:10px;color:#999;display:inline-block}
+.follow-input{display:flex;gap:8px;align-items:center;padding:12px 0 0;border-top:1px solid #f0f0f0}
+.follow-input .ways{display:flex;gap:4px}
+.follow-input .ways span{padding:6px 10px;background:#f8fafc;border-radius:6px;font-size:11px;color:#666;cursor:pointer}
+.follow-input .ways span.on{background:#eef2ff;color:#4f46e5;font-weight:500}
+.follow-input input{flex:1;padding:8px 12px;border-radius:8px;border:1px solid #e2e8f0;font-size:12px;outline:none}
+.follow-input .send{padding:8px 16px;background:#eef2ff;color:#4f46e5;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer}
+.form-section{margin-bottom:16px}
+.form-section .st{font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:10px}
+.form-section .sd{font-size:11px;color:#bbb;margin-bottom:8px}
+.form-row{display:flex;gap:10px;margin-bottom:10px}
+.form-field{flex:1;padding:10px 12px;border-radius:8px;border:1px solid #e2e8f0;font-size:13px;outline:none;background:#fff}
+.form-field.picker{display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:#999}
+.form-field.picker .ar{font-size:10px}
+textarea.form-field{resize:none;font-family:inherit;width:100%}
+.form-field.privacy{border-color:#c7d2fe;background:#fafaff}
+.form-btns{display:flex;gap:10px;padding-top:8px}
+.form-btns button{flex:1;padding:12px 0;border-radius:8px;font-size:13px;cursor:pointer;border:none}
+.form-btns .btn-save{flex:1;background:#f8fafc;color:#666;border:1px solid #e2e8f0}
+.form-btns .btn-pub{flex:2;background:#eef2ff;color:#4f46e5;font-weight:500}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:flex-end;justify-content:center}
+.modal.show{display:flex}
+#confirmModal{align-items:center}
+#confirmModal .modal-box{border-radius:14px;max-width:280px;width:calc(100% - 64px);overflow:hidden;padding:0}
+.modal-box{background:#fff;border-radius:16px 16px 0 0;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;padding:0 0 24px}
+.modal-hd{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid #f0f0f0;position:sticky;top:0;background:#fff;z-index:1}
+.modal-hd .tit{font-size:15px;font-weight:500;color:#1a1a2e}
+.modal-hd .cls{font-size:13px;color:#999;cursor:pointer}
+.modal-body{padding:16px}
+.modal-body textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #e2e8f0;font-size:13px;outline:none;resize:none;font-family:inherit}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rg-item{padding:8px 10px;background:#f8fafc;border-radius:8px}
+.rg-item .rl{font-size:10px;color:#bbb}
+.rg-item .rv{font-size:13px;font-weight:500;color:#1a1a2e;margin-top:2px}
+.rg-item .rv input{border:none;background:transparent;font-size:13px;font-weight:500;color:#1a1a2e;outline:none;padding:0;width:100%}
+.modal-foot{display:flex;gap:10px;padding:12px 16px 0;border-top:1px solid #f0f0f0}
+.modal-foot button{flex:1;padding:11px 0;border-radius:8px;font-size:13px;cursor:pointer;border:none}
+.modal-foot .btn-back{flex:1;background:#f8fafc;color:#666;border:1px solid #e2e8f0}
+.modal-foot .btn-confirm{flex:2;background:#eef2ff;color:#4f46e5;font-weight:500}
+.ai-rec-badge{padding:2px 8px;background:#ecfdf5;color:#059669;border-radius:4px;font-size:10px;font-weight:500;display:inline-block;margin-left:8px}
+
+/* ===== 服务中心 ===== */
+.svc-grid-full{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.svc-card{background:#f8fafc;border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.svc-card:active{background:#eef2ff}
+.svc-card-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.svc-card .nm{font-size:14px;font-weight:500;color:#1a1a2e}
+.svc-card .desc{font-size:11px;color:#999;margin-top:2px}
+.svc-card-wide{grid-column:span 2}
+
+/* ===== 阿姨管理 ===== */
+.worker-tabs{display:flex;padding:12px 0 0;border-bottom:1px solid #f0f0f0;overflow-x:auto}
+.worker-tabs span{padding:8px 12px;font-size:12px;cursor:pointer;color:#999;white-space:nowrap;flex-shrink:0}
+.worker-tabs span.on{color:#4f46e5;font-weight:500;border-bottom:2px solid #4f46e5}
+.worker-tab-content,.coop-tab-content,.wd-tab{transition:opacity .15s}
+
+/* 进度条 */
+.progress-bar{height:6px;background:#f0f0f0;border-radius:3px;margin-bottom:8px;overflow:hidden}
+.progress-bar .fill{height:100%;border-radius:3px}
+.progress-tags{display:flex;gap:6px;font-size:10px;color:#999;margin-bottom:8px;flex-wrap:wrap}
+.progress-tags .done{color:#059669}
+.progress-tags .todo{color:#ccc}
+
+/* ===== 通话记录 ===== */
+.call-card{border-radius:10px;overflow:hidden;margin-bottom:8px}
+.call-card.alert{border:1px solid #fde68a}
+.call-card.normal{border:1px solid #f0f0f0}
+.call-card .top{display:flex;justify-content:space-between;align-items:center;padding:10px 12px}
+.call-card.alert .top{background:#fffbeb}
+.call-card .caller{display:flex;align-items:center;gap:8px}
+.call-card .caller .nm{font-size:13px;font-weight:500;color:#1a1a2e}
+.call-card .caller .tm{font-size:11px;color:#999}
+.call-card .ai-tag{padding:2px 8px;background:#fef3c7;color:#d97706;border-radius:4px;font-size:10px;font-weight:500}
+.call-card .ai-text{padding:0 12px;font-size:11px;color:#d97706;margin-bottom:4px}
+.call-card .ai-meta{padding:0 12px 8px;display:flex;gap:6px;flex-wrap:wrap}
+.call-card .ai-meta span{padding:2px 6px;background:#fef3c7;border-radius:4px;font-size:9px;color:#92400e}
+.call-card .ai-ops{display:flex;gap:6px;padding:6px 12px 8px;border-top:1px solid #fde68a}
+.call-card .ai-ops button{padding:3px 10px;border:none;border-radius:5px;font-size:10px;cursor:pointer}
+.call-card .summary{padding:0 12px 10px;font-size:11px;color:#999}
+
+/* ===== 待审批状态变更 ===== */
+.approve-card{border:1px solid #fca5a5;border-radius:12px;overflow:hidden}
+.approve-card .bd{padding:12px;display:flex;align-items:center;gap:10px}
+.approve-card .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;flex-shrink:0}
+.approve-card .info{flex:1}
+.approve-card .row1{display:flex;align-items:center;gap:6px}
+.approve-card .row1 .nm{font-size:14px;font-weight:500;color:#1a1a2e}
+.approve-card .row1 .ph{font-size:11px;color:#bbb}
+.approve-card .change{display:flex;gap:6px;margin-top:4px;font-size:12px;color:#666}
+.approve-card .arrow{color:#dc2626}
+.approve-card .to{font-weight:500}
+.approve-card .confidence{padding:3px 8px;border-radius:4px;font-size:10px;font-weight:500}
+.approve-card .detect-text{padding:0 12px 4px;font-size:11px;color:#999}
+.approve-card .listen{padding:0 12px 8px;display:flex;gap:8px;align-items:center}
+.approve-card .listen button{font-size:11px;color:#4f46e5;background:none;border:none;cursor:pointer;padding:0}
+.approve-card .listen .ago{font-size:10px;color:#bbb}
+.approve-card .actions{display:flex;gap:8px;padding:8px 12px 10px;border-top:1px solid #fecaca}
+
+/* ===== 海报弹窗 ===== */
+.poster-modal .modal-box{background:transparent;display:flex;flex-direction:column;align-items:center;padding:20px 16px 30px;width:auto}
+.poster{width:100%;max-width:320px;background:linear-gradient(180deg,#fff 0%,#fef9f0 40%,#fff5e8 100%);border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 4px 24px rgba(0,0,0,.08);border:1px solid #f0e6d3}
+.poster-brand{padding:20px 20px 12px;text-align:center}
+.poster-brand .name{font-size:16px;font-weight:700;color:#d97706;letter-spacing:2px}
+.poster-brand .by{font-size:10px;color:#b0a090;margin-top:4px}
+.poster-job{margin:0 14px;background:#fff;border-radius:10px;padding:14px;border:1px solid #f0e6d3}
+.poster-job .title-row{display:flex;justify-content:space-between;align-items:flex-start}
+.poster-job .title{font-size:16px;font-weight:600;color:#1a1a2e}
+.poster-job .salary{font-size:15px;font-weight:700;color:#d97706;padding:3px 10px;background:#fff7ed;border-radius:6px;border:1px solid #fed7aa;white-space:nowrap}
+.poster-job .sub{font-size:11px;color:#888;margin:4px 0 8px}
+.poster-job .tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.poster-job .tags span{padding:2px 8px;background:#fef9f0;border-radius:4px;font-size:10px;color:#b45309;border:1px solid #fde68a}
+.poster-job .req{border-radius:6px;padding:8px;margin-top:6px;background:#fffbeb}
+.poster-job .req .rl{font-size:10px;color:#d97706;margin-bottom:3px;font-weight:500}
+.poster-job .req .rv{font-size:11px;color:#666;line-height:1.5}
+.poster-job .foot{display:flex;gap:10px;margin-top:8px;font-size:10px;color:#999}
+.poster-divider{margin:12px 18px;border-top:1px solid #f0e6d3}
+.poster-qr{display:flex;align-items:center;gap:12px;padding:0 18px 16px}
+.poster-qr-code{width:64px;height:64px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:5px;flex-shrink:0;border:1px solid #f0e6d3}
+.poster-qr-text{color:#1a1a2e}
+.poster-qr-text .main{font-size:12px;font-weight:600;margin-bottom:2px}
+.poster-qr-text .sub{font-size:10px;color:#999}
+.poster-foot{padding:8px 18px;background:#fef9f0;text-align:center;font-size:9px;color:#b0a090;border-top:1px solid #f0e6d3}
+.poster-actions{display:flex;gap:12px;width:100%;max-width:320px}
+.poster-actions button{flex:1;padding:12px 0;border-radius:12px;font-size:13px;font-weight:500;cursor:pointer;border:none}
+.poster-actions .save{background:#fff;color:#333;border:1px solid #e2e8f0}
+.poster-actions .share{background:#07c160;color:#fff}
+
+/* ===== 全局底部导航 ===== */
+.global-nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:#fff;border-top:1px solid #f0f0f0;display:flex;justify-content:space-around;padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px));max-width:480px;margin:0 auto}
+.global-nav .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 8px;min-width:48px}
+.global-nav .nav-item .icon{font-size:18px;line-height:1}
+.global-nav .nav-item .label{font-size:10px;color:#999}
+.global-nav .nav-item.act .label{color:#4f46e5;font-weight:500}
+#app{padding-bottom:60px}
+.empty-state{padding:40px 0;text-align:center;font-size:13px;color:#ccc;line-height:2}
+.empty-state .icon{font-size:40px;margin-bottom:8px}
+@keyframes fadeIn{from{opacity:0;transform:translate(-50%,-50%) scale(.9)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ==================== 看板 ==================== -->
+<div id="page-dashboard" class="page active">
+  <div class="header">
+    <div class="header-left">
+      <h1>安心家政</h1>
+      <p>张经理 · 个人账号</p>
+    </div>
+    <div class="header-right"><span>套餐 · 标准版</span><span>设置</span></div>
+  </div>
+
+  <!-- ===== 双英雄卡片：岗位大厅 + 海量阿姨 ===== -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+    <!-- 岗位大厅 -->
+    <div onclick="goPage('page-coop-hall')" style="background:linear-gradient(135deg,#eef2ff,#dbeafe);border-radius:16px;padding:24px 16px 20px;cursor:pointer;border:1px solid #c7d2fe">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div style="width:44px;height:44px;background:#4f46e5;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px">📋</div>
+        <div>
+          <div style="font-size:16px;font-weight:600;color:#4338ca">岗位<span style="font-size:28px;font-weight:700;color:#4338ca">大厅</span></div>
+          <div style="font-size:10px;color:#a5b4fc;margin-top:2px;letter-spacing:1px">合作大厅 · 投递管理</div>
+        </div>
+      </div>
+      <div style="height:1px;background:rgba(79,70,229,.15);margin-bottom:14px"></div>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1;background:rgba(255,255,255,.7);border-radius:10px;padding:10px 4px;text-align:center">
+          <div style="font-size:24px;font-weight:700;color:#4338ca">5</div>
+          <div style="font-size:10px;color:#6366f1">我发布的</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.7);border-radius:10px;padding:10px 4px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:#ef4444">12368</div>
+          <div style="font-size:10px;color:#999">总岗位</div>
+        </div>
+      </div>
+    </div>
+    <!-- 海量阿姨 -->
+    <div onclick="goPage('page-worker')" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:16px;padding:24px 16px 20px;cursor:pointer;border:1px solid #a7f3d0">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div style="width:44px;height:44px;background:#059669;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px">👩</div>
+        <div>
+          <div style="font-size:16px;font-weight:600;color:#065f46"><span style="font-size:28px;font-weight:700;color:#065f46">海量</span>阿姨</div>
+          <div style="font-size:10px;color:#6ee7b7;margin-top:2px;letter-spacing:1px">同城 · 私库 · 共享</div>
+        </div>
+      </div>
+      <div style="height:1px;background:rgba(5,150,105,.15);margin-bottom:14px"></div>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1;background:rgba(255,255,255,.7);border-radius:10px;padding:10px 4px;text-align:center">
+          <div style="font-size:24px;font-weight:700;color:#065f46">156</div>
+          <div style="font-size:10px;color:#059669">我的阿姨</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.7);border-radius:10px;padding:10px 4px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:#059669">23608</div>
+          <div style="font-size:10px;color:#999">同城阿姨</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 增值服务 ===== -->
+  <div class="svc-section">
+    <div class="svc-header">
+      <div class="tit">增值服务</div>
+      <div class="all" onclick="goPage('page-services')">全部 ›</div>
+    </div>
+    <div class="svc-grid">
+      <div class="svc-item" onclick="alert('远程面试')"><div class="svc-icon" style="background:#dbeafe">📹</div><div class="svc-label">远程面试</div></div>
+      <div class="svc-item" onclick="alert('家政保险')"><div class="svc-icon" style="background:#fef3c7">🛡️</div><div class="svc-label">家政保险</div></div>
+      <div class="svc-item" onclick="alert('家政体检')"><div class="svc-icon" style="background:#d1fae5">🏥</div><div class="svc-label">家政体检</div></div>
+      <div class="svc-item" onclick="alert('宣传海报')"><div class="svc-icon" style="background:#ede9fe">🎨</div><div class="svc-label">宣传海报</div></div>
+      <div class="svc-item" onclick="alert('电子合同')"><div class="svc-icon" style="background:#fce7f3">📝</div><div class="svc-label">电子合同</div></div>
+    </div>
+  </div>
+
+  <!-- ===== 今日待办（简洁版） ===== -->
+  <div style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;padding:12px 14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:13px;font-weight:500;color:#1a1a2e">今日待办</span>
+      <span style="font-size:10px;color:#999">4 项</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0">
+      <div onclick="goPage('page-worker');setTimeout(function(){switchWorkerTab(document.querySelector('#workerTabs span:nth-child(4)'),3)},100)" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f8f8f8;cursor:pointer">
+        <span style="width:5px;height:5px;background:#ef4444;border-radius:50%;flex-shrink:0"></span>
+        <span style="flex:1;font-size:12px;color:#666">3 份阿姨简历待审核</span>
+        <span style="font-size:11px;color:#4f46e5;font-weight:500;flex-shrink:0">去处理 ›</span>
+      </div>
+      <div onclick="goPage('page-worker');setTimeout(function(){switchWorkerTab(document.querySelector('#workerTabs span:nth-child(3)'),2)},100)" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f8f8f8;cursor:pointer">
+        <span style="width:5px;height:5px;background:#f59e0b;border-radius:50%;flex-shrink:0"></span>
+        <span style="flex:1;font-size:12px;color:#666">2 个岗位匹配到新阿姨</span>
+        <span style="font-size:11px;color:#4f46e5;font-weight:500;flex-shrink:0">查看 ›</span>
+      </div>
+      <div onclick="alert('试岗结束流程（待设计）')" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f8f8f8;cursor:pointer">
+        <span style="width:5px;height:5px;background:#3b82f6;border-radius:50%;flex-shrink:0"></span>
+        <span style="flex:1;font-size:12px;color:#666">1 位试岗期结束，合作红包即将释放</span>
+        <span style="font-size:11px;color:#4f46e5;font-weight:500;flex-shrink:0">详情 ›</span>
+      </div>
+      <div onclick="goPage('page-worker-detail')" style="display:flex;align-items:center;gap:8px;padding:8px 0 0;cursor:pointer">
+        <span style="width:5px;height:5px;background:#d1d5db;border-radius:50%;flex-shrink:0"></span>
+        <span style="flex:1;font-size:12px;color:#666">1 位阿姨已连续待岗超30天</span>
+        <span style="font-size:11px;color:#4f46e5;font-weight:500;flex-shrink:0">推荐 ›</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 服务中心 ==================== -->
+<div id="page-services" class="page">
+  <div class="page-header">
+    <div class="tit" onclick="goBack()">&larr; 服务中心</div>
+  </div>
+  <div class="svc-grid-full">
+    <div class="svc-card" onclick="alert('远程面试')">
+      <div class="svc-card-icon" style="background:#dbeafe">📹</div>
+      <div><div class="nm">远程面试</div><div class="desc">视频面试 · 在线沟通</div></div>
+    </div>
+    <div class="svc-card" onclick="alert('家政保险')">
+      <div class="svc-card-icon" style="background:#fef3c7">🛡️</div>
+      <div><div class="nm">家政保险</div><div class="desc">投保 · 保单管理</div></div>
+    </div>
+    <div class="svc-card" onclick="alert('家政体检')">
+      <div class="svc-card-icon" style="background:#d1fae5">🏥</div>
+      <div><div class="nm">家政体检</div><div class="desc">体检预约 · 报告管理</div></div>
+    </div>
+    <div class="svc-card" onclick="alert('宣传海报')">
+      <div class="svc-card-icon" style="background:#ede9fe">🎨</div>
+      <div><div class="nm">宣传海报</div><div class="desc">模板制作 · 品牌推广</div></div>
+    </div>
+    <div class="svc-card svc-card-wide" onclick="alert('电子合同')">
+      <div class="svc-card-icon" style="background:#fce7f3">📝</div>
+      <div><div class="nm">电子合同</div><div class="desc">合同模板 · 在线签署 · 合同管理</div></div>
+    </div>
+  </div>
+  <div style="margin-top:20px;padding:12px 14px;background:#f8fafc;border-radius:10px;font-size:11px;color:#999;line-height:1.6">
+    服务中心提供家政业务所需的配套工具，帮助您高效管理招聘、保险、体检、宣传和合同等环节。
+  </div>
+</div>
+
+<!-- ==================== 客户列表 ==================== -->
+<div id="page-customer" class="page">
+  <div class="page-header">
+    <div class="tit" onclick="goBack()">&larr; 客户管理</div>
+    <div class="act">
+      <span onclick="showModal('aiModal')">🤖 AI录入</span>
+      <span style="color:#4f46e5;font-weight:500" onclick="goPage('page-add-cust')">+ 新增客户</span>
+    </div>
+  </div>
+  <div class="status-tabs">
+    <span class="stab on">全部 38</span>
+    <span class="stab">待跟进 12</span>
+    <span class="stab">跟进中 18</span>
+    <span class="stab">招聘中 5</span>
+    <span class="stab">已上户 3</span>
+  </div>
+  <div class="search-bar"><input placeholder="搜索客户姓名、电话..." oninput="searchCust(this.value)"></div>
+  <div class="cust-list">
+    <div class="cust-card">
+      <div class="bd">
+        <div class="cust-row1">
+          <div class="cust-avatar"><div class="av" style="background:#fef2f2;color:#ef4444">李</div><div><div class="nm">李春芳</div><div class="ph">138 **** 5678</div></div></div>
+          <div class="cust-tags"><span class="tag danger">55天未跟进</span><span class="tag gray">转介绍</span></div>
+        </div>
+        <div class="cust-info"><span>求育儿嫂</span><span>6000元/月</span><span>住家</span><span>武侯区</span></div>
+        <div class="cust-ops">
+          <button class="btn-info" onclick="goPage('page-cust-detail')">写跟进</button>
+          <button class="btn-ok" onclick="goPage('page-add-cust')">发布需求</button>
+          <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+        </div>
+      </div>
+    </div>
+    <div class="cust-card">
+      <div class="bd">
+        <div class="cust-row1">
+          <div class="cust-avatar"><div class="av" style="background:#eef2ff;color:#4f46e5">王</div><div><div class="nm">王美玲</div><div class="ph">139 **** 2321</div></div></div>
+          <div class="cust-tags"><span class="tag warn">今日跟进</span><span class="tag gray">公司指派</span></div>
+        </div>
+        <div class="cust-info"><span>求月嫂</span><span>8800元/月</span><span>住家</span><span>锦江区</span></div>
+        <div class="cust-ops">
+          <button class="btn-info" onclick="goPage('page-cust-detail')">写跟进</button>
+          <button class="btn-ok" onclick="goPage('page-add-cust')">发布需求</button>
+          <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+        </div>
+      </div>
+    </div>
+    <div class="cust-card" style="border-color:#a7f3d0">
+      <div class="bd">
+        <div class="cust-row1">
+          <div class="cust-avatar"><div class="av" style="background:#ecfdf5;color:#059669">张</div><div><div class="nm">张秀英</div><div class="ph">136 **** 9452</div></div></div>
+          <div class="cust-tags"><span class="tag ok">招聘中</span><span class="tag gray">广告</span></div>
+        </div>
+        <div class="cust-info"><span>求育儿嫂</span><span>5000元/月</span><span>白班</span><span>金牛区</span><span style="color:#4f46e5">已上架大厅</span></div>
+        <div class="cust-ops">
+          <button class="btn-info">写跟进</button>
+          <button class="btn-info">查看岗位</button>
+          <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+        </div>
+      </div>
+    </div>
+    <div class="cust-card" style="opacity:0.6">
+      <div class="bd">
+        <div class="cust-row1">
+          <div class="cust-avatar"><div class="av" style="background:#f8fafc;color:#bbb">刘</div><div><div class="nm" style="color:#999">刘芳</div><div class="ph">137 **** 6789</div></div></div>
+          <span class="tag gray">已上户</span>
+        </div>
+        <div class="cust-info" style="color:#bbb"><span>已安排阿姨 · 王桂芳</span><span>2026-04-15 起</span></div>
+        <div class="cust-ops">
+          <button class="btn-gray">上户详情</button>
+          <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 客户详情 ==================== -->
+<div id="page-cust-detail" class="page">
+  <div class="page-header">
+    <div class="tit" onclick="goBack()">&larr;</div>
+    <div class="act"><span>编辑</span><span style="color:#ef4444">分配</span></div>
+  </div>
+  <div class="detail-header">
+    <div class="av" style="background:#eef2ff;color:#4f46e5">王</div>
+    <div><div style="display:flex;align-items:center;gap:8px"><span class="nm">王美玲</span><span class="tag warn">跟进中</span></div><div class="ph">139 **** 2321</div></div>
+    <div class="ops"><button class="btn-ok" style="padding:6px 14px;border:none;border-radius:8px;font-size:12px;cursor:pointer" onclick="goPage('page-add-cust')">发布岗位</button><button class="btn-gray" style="padding:6px 14px;border:none;border-radius:8px;font-size:12px;cursor:pointer">📞</button></div>
+  </div>
+  <div class="info-bar">
+    <div><span class="l">需求：</span>求月嫂</div><div><span class="l">薪资：</span>8800元/月</div><div><span class="l">住家：</span>住家</div>
+    <div><span class="l">上户：</span>越快越好</div><div><span class="l">地址：</span>锦江区东大街88号</div><div><span class="l">来源：</span>公司指派 · 04-20</div>
+  </div>
+  <div class="detail-tabs" id="cdTabs">
+    <div class="on" onclick="switchCdTab(this,0)">跟进记录 6</div>
+    <div onclick="switchCdTab(this,1)">招聘记录 2</div>
+    <div onclick="switchCdTab(this,2)">订单记录 1</div>
+  </div>
+  <div class="cd-tab" id="cdTab0">
+    <div class="follow-list">
+      <div class="fl-item">
+        <div class="fl-av" style="background:#eef2ff;color:#4f46e5">张</div>
+        <div style="flex:1"><div class="fl-top"><span class="fl-name">张经理</span><span class="fl-time">今天 10:30</span></div><div class="fl-text">已联系客户，沟通月嫂需求。客户要求预产期前一个月到位，有健康证和月嫂证优先。发了3份简历给客户看。</div><span class="fl-way">📞 电话沟通</span></div>
+      </div>
+      <div class="fl-item">
+        <div class="fl-av" style="background:#eef2ff;color:#4f46e5">张</div>
+        <div style="flex:1"><div class="fl-top"><span class="fl-name">张经理</span><span class="fl-time">04-22 15:12</span></div><div class="fl-text">初次联系，客户预产期7月，想找月嫂26天住家，预算8000-9000。已记录需求，后续跟进安排面试。</div><span class="fl-way">💬 微信沟通</span></div>
+      </div>
+      <div class="fl-item">
+        <div class="fl-av" style="background:#f8fafc;color:#bbb">系</div>
+        <div style="flex:1"><div class="fl-top"><span class="fl-name">系统</span><span class="fl-time">04-20 14:00</span></div><div class="fl-text" style="color:#bbb">客户由 管理员 · 丁民 分配至 张经理</div></div>
+      </div>
+    </div>
+    <div class="follow-input">
+      <div class="ways"><span class="on">电话</span><span>微信</span><span>面谈</span></div>
+      <input placeholder="写跟进内容..."><button class="send">发送</button>
+    </div>
+  </div>
+  <div class="cd-tab" id="cdTab1" style="display:none;padding:12px 0">
+    <div class="cust-card" style="border-color:#a7f3d0">
+      <div class="bd">
+        <div class="cust-row1"><div class="nm" style="font-size:14px">求月嫂 · 26天住家</div><span class="tag ok" style="font-size:11px">招聘中</span></div>
+        <div class="cust-info"><span>8800元/月</span><span>住家</span><span>锦江区</span><span>已上架大厅</span></div>
+        <div class="cust-ops"><button class="btn-ok">查看匹配</button><button class="btn-info">编辑岗位</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="cd-tab" id="cdTab2" style="display:none;padding:12px 0">
+    <div class="empty-state"><div class="icon">📋</div>暂无订单记录</div>
+  </div>
+</div>
+
+<!-- ==================== 新增客户 ==================== -->
+<div id="page-add-cust" class="page">
+  <div class="page-header">
+    <div class="tit" onclick="goBack()">&larr; 新增客户/岗位</div>
+    <div class="act" style="font-size:12px;color:#999;cursor:pointer" onclick="showModal('aiModal')">🤖 AI录入</div>
+  </div>
+  <div class="form-section">
+    <div class="st">客户信息</div>
+    <div class="form-row"><input class="form-field" placeholder="姓名 *"><input class="form-field" placeholder="电话 *"></div>
+    <div class="form-row"><input class="form-field" placeholder="微信号"><div class="form-field picker"><span>客户来源</span><span class="ar">▼</span></div></div>
+  </div>
+  <div class="form-section">
+    <div class="st">服务需求</div>
+    <div class="form-row"><div class="form-field picker"><span>服务类型 *</span><span class="ar">▼</span></div><div class="form-field picker"><span>住家要求</span><span class="ar">▼</span></div></div>
+    <div class="form-row"><input class="form-field" placeholder="薪资待遇（元/月）*"><div class="form-field picker"><span>假期</span><span class="ar">▼</span></div></div>
+    <div class="form-row"><div class="form-field picker"><span>上户日期</span><span class="ar">▼</span></div><input class="form-field" placeholder="具体地址" style="flex:1.5"></div>
+  </div>
+  <div class="form-section">
+    <div class="st">岗位描述</div>
+    <div class="sd">展示在合作大厅，对外可见</div>
+    <textarea class="form-field" rows="3" placeholder="详细描述需求，如：要求有月嫂证、健康证，带过3个以上新生儿..."></textarea>
+  </div>
+  <div class="form-section">
+    <div class="st" style="color:#4f46e5">🔒 内部备注</div>
+    <div class="sd" style="color:#c7d2fe">仅自己和同公司员工可见</div>
+    <textarea class="form-field privacy" rows="2" placeholder="内部备注，合作大厅不展示"></textarea>
+  </div>
+  <div class="form-btns">
+    <button class="btn-save" onclick="showToast('已保存草稿')">保存草稿</button>
+    <button class="btn-pub" onclick="showToast('✅ 已保存并发布到合作大厅');goPage('page-dashboard')">保存并发布到合作大厅</button>
+  </div>
+</div>
+
+<!-- ==================== 阿姨管理 ==================== -->
+<div id="page-worker" class="page">
+  <div class="page-header">
+    <div class="tit" onclick="goBack()">&larr; 阿姨管理</div>
+    <div class="act"><span style="color:#4f46e5;font-weight:500;font-size:12px" onclick="goPage('page-add-worker')">+ 录入阿姨</span></div>
+  </div>
+  <div class="worker-tabs" id="workerTabs">
+    <span class="on" onclick="switchWorkerTab(this,0)">同城阿姨</span>
+    <span onclick="switchWorkerTab(this,1)">我的阿姨 156</span>
+    <span onclick="switchWorkerTab(this,2)">匹配岗位</span>
+    <span onclick="switchWorkerTab(this,3)">待完善简历 3</span>
+    <span onclick="switchWorkerTab(this,4)" style="color:#dc2626">待审批状态 2</span>
+  </div>
+  <div class="search-bar" style="margin-top:12px"><input placeholder="搜索阿姨姓名、电话..." oninput="searchWorker(this.value)"></div>
+
+  <!-- Tab0: 同城阿姨 -->
+  <div class="worker-tab-content" id="workerTab0" >
+    <!-- 多维度筛选 -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+      <span onclick="filterCityWorker('all',this)" style="padding:4px 10px;background:#eef2ff;color:#4f46e5;border-radius:12px;font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap">全部推荐</span>
+      <span onclick="filterCityWorker('yuesao',this)" style="padding:4px 10px;background:#f8fafc;color:#999;border-radius:12px;font-size:11px;cursor:pointer;white-space:nowrap">月嫂</span>
+      <span onclick="filterCityWorker('yuer',this)" style="padding:4px 10px;background:#f8fafc;color:#999;border-radius:12px;font-size:11px;cursor:pointer;white-space:nowrap">育儿嫂</span>
+      <span onclick="filterCityWorker('baojie',this)" style="padding:4px 10px;background:#f8fafc;color:#999;border-radius:12px;font-size:11px;cursor:pointer;white-space:nowrap">保洁</span>
+      <span onclick="filterCityWorker('hugong',this)" style="padding:4px 10px;background:#f8fafc;color:#999;border-radius:12px;font-size:11px;cursor:pointer;white-space:nowrap">护工</span>
+    </div>
+    <!-- 第二排筛选：区域/经验/年龄 -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      <span style="padding:3px 8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:10px;color:#666;cursor:pointer">📍 全城</span>
+      <span style="padding:3px 8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:10px;color:#666;cursor:pointer">🥇 经验不限</span>
+      <span style="padding:3px 8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:10px;color:#666;cursor:pointer">🎂 年龄不限</span>
+      <span style="padding:3px 8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:10px;color:#666;cursor:pointer">📏 距离不限</span>
+    </div>
+    <div class="cust-list" id="cityWorkerList">
+      <!-- 阿姨1 -->
+      <div class="cust-card" style="border-color:#86efac" data-service="yuesao">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar">
+              <div class="av" style="background:#dcfce7;color:#15803d">陈</div>
+              <div><div class="nm">陈美兰</div><div class="ph">137****8901 · 38岁 · 6年经验</div></div>
+            </div>
+            <div class="cust-tags">
+              <span style="padding:2px 6px;background:#ecfdf5;color:#059669;border-radius:4px;font-size:9px">待岗</span>
+              <span style="padding:2px 6px;background:#f0fdf4;color:#16a34a;border-radius:4px;font-size:9px">今日入驻</span>
+            </div>
+          </div>
+          <div class="cust-info"><span>月嫂</span><span>期望8000+</span><span>锦江区</span><span>🚌 3.2km</span></div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="padding:2px 6px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:9px">月嫂证 ✓</span>
+            <span style="padding:2px 6px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:9px">健康证 ✓</span>
+            <span style="padding:2px 6px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:9px">本科</span>
+          </div>
+          <div style="font-size:11px;color:#999;margin-bottom:8px">维护经理：家家乐家政 · 李经理</div>
+          <div class="cust-ops">
+            <button class="btn-info">查看简历</button>
+            <button class="btn-ok">📞 虚拟号联系</button>
+          </div>
+        </div>
+      </div>
+      <!-- 阿姨2 -->
+      <div class="cust-card" data-service="yuer">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar">
+              <div class="av" style="background:#fef3c7;color:#92400e">杨</div>
+              <div><div class="nm">杨素芬</div><div class="ph">135****3456 · 42岁 · 3年经验</div></div>
+            </div>
+            <div class="cust-tags">
+              <span style="padding:2px 6px;background:#dbeafe;color:#2563eb;border-radius:4px;font-size:9px">上户中</span>
+              <span style="padding:2px 6px;background:#f0f0f0;color:#999;border-radius:4px;font-size:9px">不可合作</span>
+            </div>
+          </div>
+          <div class="cust-info"><span>育儿嫂</span><span>期望5000+</span><span>武侯区</span><span>🚌 5.8km</span></div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="padding:2px 6px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:9px">育儿嫂证 ✓</span>
+            <span style="padding:2px 6px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:9px">健康证 ✓</span>
+          </div>
+          <div style="font-size:11px;color:#999;margin-bottom:8px">维护经理：安心家政 · 张经理</div>
+          <div class="cust-ops">
+            <button class="btn-gray">查看简历</button>
+            <button class="btn-gray">📞 虚拟号联系</button>
+          </div>
+        </div>
+      </div>
+      <!-- 阿姨3 新增 -->
+      <div class="cust-card" style="border-color:#86efac" data-service="baojie">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar">
+              <div class="av" style="background:#dbeafe;color:#2563eb">刘</div>
+              <div><div class="nm">刘小芳</div><div class="ph">138****6789 · 35岁 · 2年经验</div></div>
+            </div>
+            <div class="cust-tags">
+              <span style="padding:2px 6px;background:#ecfdf5;color:#059669;border-radius:4px;font-size:9px">待岗</span>
+              <span style="padding:2px 6px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:9px">可合作</span>
+            </div>
+          </div>
+          <div class="cust-info"><span>保洁</span><span>期望4000+</span><span>青羊区</span><span>🚌 4.1km</span></div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="padding:2px 6px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:9px">健康证 ✓</span>
+          </div>
+          <div style="font-size:11px;color:#999;margin-bottom:8px">维护经理：熊猫家政 · 周经理</div>
+          <div class="cust-ops">
+            <button class="btn-info">查看简历</button>
+            <button class="btn-ok">📞 虚拟号联系</button>
+          </div>
+        </div>
+      </div>
+      <!-- 阿姨4 新增 -->
+      <div class="cust-card" data-service="yuer">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar">
+              <div class="av" style="background:#fce7f3;color:#db2777">赵</div>
+              <div><div class="nm">赵红梅</div><div class="ph">152****2345 · 45岁 · 8年经验</div></div>
+            </div>
+            <div class="cust-tags">
+              <span style="padding:2px 6px;background:#ecfdf5;color:#059669;border-radius:4px;font-size:9px">待岗</span>
+              <span style="padding:2px 6px;background:#f0fdf4;color:#16a34a;border-radius:4px;font-size:9px">可合作</span>
+            </div>
+          </div>
+          <div class="cust-info"><span>育儿嫂</span><span>期望6000+</span><span>锦江区</span><span>🚌 2.0km</span></div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="padding:2px 6px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:9px">育儿嫂证 ✓</span>
+            <span style="padding:2px 6px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:9px">健康证 ✓</span>
+            <span style="padding:2px 6px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:9px">高中</span>
+            <span style="padding:2px 6px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:9px">优秀好评</span>
+          </div>
+          <div style="font-size:11px;color:#999;margin-bottom:8px">维护经理：放心家政 · 陈经理</div>
+          <div class="cust-ops">
+            <button class="btn-info">查看简历</button>
+            <button class="btn-ok">📞 虚拟号联系</button>
+          </div>
+        </div>
+      </div>
+      <!-- 阿姨5 新增 -->
+      <div class="cust-card" data-service="hugong">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar">
+              <div class="av" style="background:#e0f2fe;color:#0369a1">吴</div>
+              <div><div class="nm">吴秀英</div><div class="ph">139****5678 · 52岁 · 5年经验</div></div>
+            </div>
+            <div class="cust-tags">
+              <span style="padding:2px 6px;background:#ecfdf5;color:#059669;border-radius:4px;font-size:9px">待岗</span>
+              <span style="padding:2px 6px;background:#f0fdf4;color:#16a34a;border-radius:4px;font-size:9px">可合作</span>
+            </div>
+          </div>
+          <div class="cust-info"><span>护工</span><span>期望5500+</span><span>成华区</span><span>🚌 6.5km</span></div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="padding:2px 6px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:9px">护工证 ✓</span>
+            <span style="padding:2px 6px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:9px">健康证 ✓</span>
+            <span style="padding:2px 6px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:9px">养老护理证</span>
+          </div>
+          <div style="font-size:11px;color:#999;margin-bottom:8px">维护经理：爱心家政 · 刘经理</div>
+          <div class="cust-ops">
+            <button class="btn-info">查看简历</button>
+            <button class="btn-ok">📞 虚拟号联系</button>
+          </div>
+        </div>
+      </div>
+      <!-- 阿姨6 新增 -->
+      <div class="cust-card" data-service="yuesao">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar">
+              <div class="av" style="background:#fef3c7;color:#92400e">黄</div>
+              <div><div class="nm">黄桂芳</div><div class="ph">158****9012 · 40岁 · 10年经验</div></div>
+            </div>
+            <div class="cust-tags">
+              <span style="padding:2px 6px;background:#ecfdf5;color:#059669;border-radius:4px;font-size:9px">待岗</span>
+              <span style="padding:2px 6px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:9px">金牌月嫂</span>
+            </div>
+          </div>
+          <div class="cust-info"><span>月嫂</span><span>期望12000+</span><span>高新区</span><span>🚌 7.0km</span></div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="padding:2px 6px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:9px">高级月嫂证 ✓</span>
+            <span style="padding:2px 6px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:9px">健康证 ✓</span>
+            <span style="padding:2px 6px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:9px">催乳师证 ✓</span>
+            <span style="padding:2px 6px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:9px">大专</span>
+          </div>
+          <div style="font-size:11px;color:#999;margin-bottom:8px">维护经理：家家乐家政 · 李经理</div>
+          <div class="cust-ops">
+            <button class="btn-info">查看简历</button>
+            <button class="btn-ok">📞 虚拟号联系</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab1: 我的阿姨 -->
+  <div class="worker-tab-content" id="workerTab1">
+    <div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:10px">
+      <span onclick="filterWorkerTab('all',this)" style="padding:4px 10px;background:#eef2ff;color:#4f46e5;border-radius:12px;font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap">全部 156</span>
+      <span onclick="filterWorkerTab('available',this)" style="padding:4px 10px;background:#f8fafc;color:#999;border-radius:12px;font-size:11px;cursor:pointer;white-space:nowrap">待岗中 42</span>
+      <span onclick="filterWorkerTab('working',this)" style="padding:4px 10px;background:#f8fafc;color:#999;border-radius:12px;font-size:11px;cursor:pointer;white-space:nowrap">上户中 98</span>
+      <span onclick="filterWorkerTab('quit',this)" style="padding:4px 10px;background:#f8fafc;color:#999;border-radius:12px;font-size:11px;cursor:pointer;white-space:nowrap">已转行 16</span>
+      <span onclick="filterWorkerTab('shared',this)" style="padding:4px 10px;background:#f8fafc;color:#999;border-radius:12px;font-size:11px;cursor:pointer;white-space:nowrap">共享库 128</span>
+      <span onclick="filterWorkerTab('private',this)" style="padding:4px 10px;background:#f8fafc;color:#999;border-radius:12px;font-size:11px;cursor:pointer;white-space:nowrap">私库 28</span>
+    </div>
+    <div class="cust-list" id="workerList">
+      <!-- 共享库阿姨 -->
+      <div class="cust-card" data-status="available" data-pool="shared">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar">
+              <div class="av" style="background:#dcfce7;color:#15803d">王</div>
+              <div><div class="nm">王桂芳</div><div class="ph">138****5678</div></div>
+            </div>
+            <div class="cust-tags">
+              <span class="tag ok">待岗中</span>
+              <span style="padding:2px 6px;background:#eef2ff;color:#4f46e5;border-radius:4px;font-size:9px">共享</span>
+            </div>
+          </div>
+          <div class="cust-info"><span>育儿嫂</span><span>5年经验</span><span>期望5000+</span><span>已实名 ✓</span></div>
+          <div class="cust-ops">
+            <button class="btn-info" onclick="goPage('page-worker-detail')">档案</button>
+            <button class="btn-ok" onclick="event.stopPropagation();toggleWorkerJobMatch(this)">推荐岗位</button>
+            <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+          </div>
+          <!-- 推荐岗位匹配（默认隐藏） -->
+          <div class="worker-job-match" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0">
+            <div style="font-size:12px;font-weight:500;color:#059669;margin-bottom:8px">🤖 以下岗位适合该阿姨 · 按匹配度排序</div>
+            <div class="wjm-batch" id="wjmBatch1">
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f0fdf4;border-radius:8px;border:1px solid #86efac;cursor:pointer;margin-bottom:6px" onclick="event.stopPropagation();goPage('page-coop-hall');setTimeout(function(){switchCoopTab(document.querySelector('#coopTabs span:nth-child(2)'),1)},100)">
+                <div style="width:36px;height:36px;border-radius:10px;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:16px">👶</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:#1a1a2e">求育儿嫂 · 带6个月宝宝</div>
+                  <div style="font-size:11px;color:#999">5000元/月 · 白班 · 武侯区</div>
+                  <div style="font-size:10px;color:#6366f1;margin-top:2px">发布方：安心家政 · 张经理</div>
+                </div>
+                <div style="text-align:right">
+                  <span style="padding:2px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:10px;font-weight:500">96%</span>
+                  <div style="font-size:10px;color:#999;margin-top:4px">去投递 ›</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;margin-bottom:6px" onclick="event.stopPropagation();goPage('page-coop-hall');setTimeout(function(){switchCoopTab(document.querySelector('#coopTabs span:nth-child(2)'),1)},100)">
+                <div style="width:36px;height:36px;border-radius:10px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:16px">🍼</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:#1a1a2e">求月嫂 · 26天住家</div>
+                  <div style="font-size:11px;color:#999">8800元/月 · 住家 · 锦江区</div>
+                  <div style="font-size:10px;color:#6366f1;margin-top:2px">发布方：家家乐家政 · 李经理</div>
+                </div>
+                <div style="text-align:right">
+                  <span style="padding:2px 8px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:10px;font-weight:500">88%</span>
+                  <div style="font-size:10px;color:#999;margin-top:4px">去投递 ›</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer" onclick="event.stopPropagation();goPage('page-coop-hall');setTimeout(function(){switchCoopTab(document.querySelector('#coopTabs span:nth-child(2)'),1)},100)">
+                <div style="width:36px;height:36px;border-radius:10px;background:#ffedd5;display:flex;align-items:center;justify-content:center;font-size:16px">🧹</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:#1a1a2e">求保洁 · 每周3次</div>
+                  <div style="font-size:11px;color:#999">3000元/月 · 钟点 · 青羊区</div>
+                  <div style="font-size:10px;color:#6366f1;margin-top:2px">发布方：熊猫家政 · 周经理</div>
+                </div>
+                <div style="text-align:right">
+                  <span style="padding:2px 8px;background:#ffedd5;color:#f97316;border-radius:4px;font-size:10px;font-weight:500">82%</span>
+                  <div style="font-size:10px;color:#999;margin-top:4px">去投递 ›</div>
+                </div>
+              </div>
+            </div>
+            <!-- 第二批 -->
+            <div class="wjm-batch" id="wjmBatch2" style="display:none">
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;margin-bottom:6px" onclick="event.stopPropagation();goPage('page-coop-hall');setTimeout(function(){switchCoopTab(document.querySelector('#coopTabs span:nth-child(2)'),1)},100)">
+                <div style="width:36px;height:36px;border-radius:10px;background:#fce7f3;display:flex;align-items:center;justify-content:center;font-size:16px">🧓</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:#1a1a2e">求护工 · 照顾老人</div>
+                  <div style="font-size:11px;color:#999">5500元/月 · 住家 · 成华区</div>
+                  <div style="font-size:10px;color:#6366f1;margin-top:2px">发布方：爱心家政 · 刘经理</div>
+                </div>
+                <div style="text-align:right">
+                  <span style="padding:2px 8px;background:#fce7f3;color:#db2777;border-radius:4px;font-size:10px;font-weight:500">78%</span>
+                  <div style="font-size:10px;color:#999;margin-top:4px">去投递 ›</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer" onclick="event.stopPropagation();goPage('page-coop-hall');setTimeout(function(){switchCoopTab(document.querySelector('#coopTabs span:nth-child(2)'),1)},100)">
+                <div style="width:36px;height:36px;border-radius:10px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:16px">🍳</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:#1a1a2e">求保姆 · 做饭做卫生</div>
+                  <div style="font-size:11px;color:#999">4500元/月 · 白班 · 青羊区</div>
+                  <div style="font-size:10px;color:#6366f1;margin-top:2px">发布方：家家乐家政 · 李经理</div>
+                </div>
+                <div style="text-align:right">
+                  <span style="padding:2px 8px;background:#ede9fe;color:#7c3aed;border-radius:4px;font-size:10px;font-weight:500">75%</span>
+                  <div style="font-size:10px;color:#999;margin-top:4px">去投递 ›</div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:center;margin-top:8px">
+              <span class="wjm-switch" id="wjmSwitchBtn" onclick="event.stopPropagation();switchWjmBatch()" style="display:inline-block;padding:6px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;font-size:12px;color:#059669;cursor:pointer">🔄 换一批</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 私库阿姨 -->
+      <div class="cust-card" data-status="available" data-pool="private">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar">
+              <div class="av" style="background:#fef3c7;color:#92400e">李</div>
+              <div><div class="nm">李秀兰</div><div class="ph">139****2321</div></div>
+            </div>
+            <div class="cust-tags">
+              <span class="tag ok">待岗中</span>
+              <span style="padding:2px 6px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:9px">私库</span>
+            </div>
+          </div>
+          <div class="cust-info"><span>月嫂</span><span>8年经验</span><span>期望8000+</span></div>
+          <div class="cust-ops">
+            <button class="btn-info" onclick="goPage('page-worker-detail')">档案</button>
+            <button class="btn-ok">推荐岗位</button>
+            <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+          </div>
+        </div>
+      </div>
+      <!-- 上户中 -->
+      <div class="cust-card" data-status="working" data-pool="shared">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar">
+              <div class="av" style="background:#dbeafe;color:#2563eb">张</div>
+              <div><div class="nm">张小红</div><div class="ph">136****9452</div></div>
+            </div>
+            <div class="cust-tags">
+              <span style="padding:2px 6px;background:#dbeafe;color:#2563eb;border-radius:4px;font-size:10px">上户中</span>
+              <span style="padding:2px 6px;background:#eef2ff;color:#4f46e5;border-radius:4px;font-size:9px">共享</span>
+            </div>
+          </div>
+          <div class="cust-info"><span>育儿嫂</span><span>雇主：锦江区李女士</span><span>2026-04-15起</span></div>
+          <div class="cust-ops">
+            <button class="btn-info" onclick="goPage('page-worker-detail')">档案</button>
+            <button class="btn-gray">上户详情</button>
+            <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Tab2: 匹配岗位 -->
+  <div class="worker-tab-content" id="workerTab2" style="display:none">
+    <!-- AI摘要 -->
+    <div style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-radius:12px;padding:14px;margin:12px 0">
+      <div style="font-size:13px;font-weight:500;color:#4338ca;margin-bottom:8px">🤖 AI 匹配分析</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+        <div><div style="font-size:22px;font-weight:700;color:#4338ca">12</div><div style="font-size:11px;color:#6366f1">可接岗位</div></div>
+        <div><div style="font-size:22px;font-weight:700;color:#4338ca">8</div><div style="font-size:11px;color:#6366f1">可匹配阿姨</div></div>
+        <div><div style="font-size:22px;font-weight:700;color:#4338ca">5</div><div style="font-size:11px;color:#6366f1">待就业高匹配</div></div>
+      </div>
+    </div>
+    <div class="cust-list">
+      <div class="cust-card" style="border-color:#86efac">
+        <div class="bd">
+          <div class="cust-row1">
+            <div style="font-size:15px;font-weight:500;color:#1a1a2e">求月嫂 · 26天住家</div>
+            <span style="padding:3px 10px;background:#ecfdf5;color:#059669;border-radius:20px;font-size:11px;font-weight:500">8800元/月</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">住家</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">锦江区</span>
+          </div>
+          <div style="margin-top:10px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">
+            <div style="font-size:12px;font-weight:500;color:#1a1a2e;margin-bottom:8px">匹配阿姨</div>
+            <div style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #f0f0f0">
+              <div style="width:32px;height:32px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#15803d;flex-shrink:0">王</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:#1a1a2e">王桂芳</div>
+                <div style="font-size:11px;color:#999">育儿嫂 · 5年经验 · 🚌 32分钟</div>
+              </div>
+              <span style="padding:2px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:10px;font-weight:500">95%</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;padding:6px 0">
+              <div style="width:32px;height:32px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#92400e;flex-shrink:0">李</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:#1a1a2e">李秀兰</div>
+                <div style="font-size:11px;color:#999">月嫂 · 8年经验 · 🚌 45分钟</div>
+              </div>
+              <span style="padding:2px 8px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:10px;font-weight:500">92%</span>
+            </div>
+            <div style="display:flex;gap:4px;margin-top:6px">
+              <span style="padding:2px 6px;background:#eef2ff;border-radius:4px;font-size:9px;color:#4f46e5">技能匹配</span>
+              <span style="padding:2px 6px;background:#eef2ff;border-radius:4px;font-size:9px;color:#4f46e5">待就业</span>
+              <span style="padding:2px 6px;background:#eef2ff;border-radius:4px;font-size:9px;color:#4f46e5">有证书</span>
+            </div>
+          </div>
+          <div class="cust-ops" style="margin-top:10px">
+            <button class="btn-info" onclick="showModal('resumeModal')">📨 代阿姨投简历</button>
+            <button class="btn-ok" onclick="toggleStoreBoard(this)">📤 上架门店展板</button>
+          </div>
+        </div>
+      </div>
+      <div class="cust-card" style="opacity:0.7">
+        <div class="bd">
+          <div class="cust-row1">
+            <div style="font-size:15px;font-weight:500;color:#999">求保姆 · 做饭做卫生</div>
+            <span style="padding:3px 10px;background:#f8fafc;color:#bbb;border-radius:20px;font-size:11px">4500元/月</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#ccc">白班</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#ccc">青羊区</span>
+          </div>
+          <div style="font-size:12px;color:#ccc;margin-top:6px">暂无匹配阿姨 · 不满足条件</div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Tab3: 待完善简历 -->
+  <div class="worker-tab-content" id="workerTab3" style="display:none">
+    <div style="margin-top:4px;padding:10px 14px;background:#fef3c7;border:1px solid #fde68a;border-radius:8px;display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span style="font-size:11px;color:#92400e;flex:1">有 3 位阿姨通过海报扫码注册但未完善简历，完善度达60%后才能发布到共享库</span>
+    </div>
+    <div class="cust-list">
+      <div class="cust-card">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar"><div class="av" style="background:#fef3c7;color:#92400e">赵</div><div><div class="nm">赵小英</div><div class="ph">135****1234 · 来自海报扫码 2天前</div></div></div>
+            <span class="tag warn">简历 20%</span>
+          </div>
+          <div class="progress-bar"><div class="fill" style="width:20%;background:#f59e0b"></div></div>
+          <div class="progress-tags"><span class="done">✓ 手机号</span><span class="todo">○ 基本信息</span><span class="todo">○ 技能证书</span><span class="todo">○ 工作经历</span><span class="todo">○ 期望薪资</span></div>
+          <div class="cust-ops">
+            <button class="btn-warn">提醒完善</button>
+            <button class="btn-info">代完善简历</button>
+            <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+          </div>
+        </div>
+      </div>
+      <div class="cust-card">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar"><div class="av" style="background:#e0f2fe;color:#0369a1">钱</div><div><div class="nm">钱小凤</div><div class="ph">136****5678 · 来自海报扫码 5天前</div></div></div>
+            <span class="tag info">简历 45%</span>
+          </div>
+          <div class="progress-bar"><div class="fill" style="width:45%;background:#3b82f6"></div></div>
+          <div class="progress-tags"><span class="done">✓ 手机号</span><span class="done">✓ 基本信息</span><span class="todo">○ 技能证书</span><span class="todo">○ 工作经历</span><span class="done">✓ 期望薪资</span></div>
+          <div class="cust-ops">
+            <button class="btn-warn">提醒完善</button>
+            <button class="btn-info">代完善简历</button>
+            <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+          </div>
+        </div>
+      </div>
+      <div class="cust-card" style="border-color:#a7f3d0">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar"><div class="av" style="background:#dcfce7;color:#15803d">孙</div><div><div class="nm">孙丽华</div><div class="ph">137****9012 · 来自海报扫码 1天前</div></div></div>
+            <span class="tag ok">简历 80%</span>
+          </div>
+          <div class="progress-bar"><div class="fill" style="width:80%;background:#16a34a"></div></div>
+          <div class="progress-tags"><span class="done">✓ 手机号</span><span class="done">✓ 基本信息</span><span class="done">✓ 技能证书</span><span class="done">✓ 工作经历</span><span class="todo">○ 期望薪资</span></div>
+          <div class="cust-ops">
+            <button class="btn-ok">审核简历</button>
+            <button class="btn-info">补充完善</button>
+            <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab4: 待审批状态变更 -->
+  <div class="worker-tab-content" id="workerTab4" style="display:none">
+    <div style="margin-top:4px">
+      <div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        待审批状态变更 <span style="font-size:11px;color:#999;font-weight:400">AI通过通话录音分析检测到状态变化</span>
+      </div>
+      <div class="approve-card">
+        <div class="bd">
+          <div class="av" style="background:#fee2e2;color:#dc2626">赵</div>
+          <div class="info">
+            <div class="row1"><span class="nm">赵小英</span><span class="ph">135****1234</span></div>
+            <div class="change"><span>当前：待岗中</span><span class="arrow">→</span><span class="to" style="color:#2563eb">上户中</span></div>
+          </div>
+          <span class="confidence" style="background:#fee2e2;color:#dc2626">AI 95%</span>
+        </div>
+        <div class="detect-text">AI检测到通话中阿姨说"我已经在雇主家做了两天了" · 来自张经理通话</div>
+        <div class="listen"><button>▶ 听取关键片段</button><span class="ago">2分钟前</span></div>
+        <div class="actions">
+          <button class="btn-ok" style="flex:1;padding:8px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500" onclick="showToast('✅ 已确认变更，赵小英状态更新为「上户中」')">✓ 确认变更</button>
+          <button class="btn-gray" style="flex:1;padding:8px 0;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;cursor:pointer" onclick="showToast('已驳回，状态不变')">✕ 驳回</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:10px 12px;background:#f8fafc;border-radius:8px;font-size:11px;color:#999;display:flex;align-items:center;gap:6px">
+        <span>💡 AI通过虚拟号通话录音分析检测到状态变更，审批通过后阿姨端状态同步更新</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== AI录入弹窗 ==================== -->
+<div id="aiModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-hd"><div class="tit">🤖 AI 录入客户</div><div class="cls" onclick="hideModal('aiModal')">取消</div></div>
+    <div class="modal-body">
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">粘贴客户发来的需求</div>
+      <textarea rows="4" placeholder="示例：&#10;你好，我想找个育儿嫂，带6个月大的宝宝，白班，工资5000一个月，单休..." style="margin-bottom:10px"></textarea>
+      <div class="form-row">
+        <button style="flex:1;padding:10px 0;background:#eef2ff;color:#4f46e5;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer">🤖 一键识别</button>
+        <button style="padding:10px 16px;background:#f8fafc;color:#666;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;cursor:pointer">使用标准模板</button>
+      </div>
+    </div>
+    <div style="height:8px;background:#f8fafc;border-top:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0"></div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:500;color:#1a1a2e">识别结果</span><span class="ai-rec-badge">✓ 识别成功</span></div>
+      <div class="result-grid">
+        <div class="rg-item"><div class="rl">姓名</div><div class="rv">杨女士</div></div>
+        <div class="rg-item"><div class="rl">电话</div><div class="rv"><input value="138****5678"></div></div>
+        <div class="rg-item"><div class="rl">服务类型</div><div class="rv">育儿嫂</div></div>
+        <div class="rg-item"><div class="rl">住家要求</div><div class="rv">白班</div></div>
+        <div class="rg-item"><div class="rl">薪资</div><div class="rv">5000元/月</div></div>
+        <div class="rg-item"><div class="rl">假期</div><div class="rv">单休</div></div>
+        <div class="rg-item"><div class="rl">地址</div><div class="rv">成都市武侯区</div></div>
+        <div class="rg-item"><div class="rl">上户日期</div><div class="rv">越快越好</div></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-back">返回修改</button>
+      <button class="btn-confirm" onclick="hideModal('aiModal');goPage('page-customer')">确认并发布到合作大厅</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 发布岗位 ==================== -->
+<!-- ==================== 合作大厅 ==================== -->
+<div id="page-coop-hall" class="page">
+  <div class="page-header">
+    <div class="tit" onclick="goBack()">&larr; 岗位大厅</div>
+    <div class="act">
+      <span style="color:#4f46e5;font-weight:500;font-size:12px" onclick="goPage('page-add-cust')">+ 新增客户</span>
+    </div>
+  </div>
+  <div class="worker-tabs" id="coopTabs">
+    <span class="on" onclick="switchCoopTab(this,0)">合作大厅 15</span>
+    <span onclick="switchCoopTab(this,1)">我的发布 5</span>
+    <span onclick="switchCoopTab(this,2)">投递管理</span>
+  </div>
+  <div class="search-bar" style="margin-top:12px"><input placeholder="搜索岗位..." oninput="searchCoop(this.value)"></div>
+
+  <!-- ===== Tab0: 合作大厅 ===== -->
+  <div class="coop-tab-content" id="coopTab0">
+    <div class="cust-list" style="margin-top:4px">
+
+      <!-- 卡片1: AI推荐 -->
+      <div class="cust-card" style="border-color:#86efac">
+        <div class="bd">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+            <span style="padding:2px 8px;background:#ecfdf5;color:#059669;border-radius:4px;font-size:10px;font-weight:500">🤖 AI推荐</span>
+            <span style="font-size:11px;color:#059669">你的阿姨有3位匹配</span>
+          </div>
+          <div class="cust-row1">
+            <div style="font-size:15px;font-weight:500;color:#1a1a2e">求月嫂 · 26天住家</div>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:#d97706;margin:6px 0">8800元/月</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">住家</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">锦江区</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">单休</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">预产期7月</span>
+          </div>
+          <div style="display:flex;align-items:center;padding:6px 0;margin-bottom:8px;border-top:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0">
+            <div style="font-size:12px;color:#666">发布方：安心家政 · 张经理&nbsp;<span style="padding:3px 10px;background:#ecfdf5;color:#059669;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer" onclick="var sub=this.textContent.indexOf('已')>=0;this.textContent=sub?'🔔 订阅':'🔔 已订阅';this.style.cssText=sub?'padding:3px 10px;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer':'padding:3px 10px;background:#ecfdf5;color:#059669;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer';showToast(sub?'已取消订阅':'✅ 已订阅安心家政·张经理的岗位发布')">🔔 已订阅</span></div>
+          </div>
+          <div style="font-size:12px;color:#666;margin-bottom:10px;line-height:1.5">预产期7月，找月嫂26天住家，有月嫂证优先，包吃住，立刻上岗</div>
+          <div class="cust-ops">
+            <button class="btn-ok" onclick="toggleStoreBoard(this)">📤 上架门店展板</button>
+            <button class="btn-info" onclick="showModal('resumeModal')">📨 代阿姨投简历</button>
+            <button class="btn-warn" onclick="showModal('posterModal')">📋 岗位海报</button>
+            <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片2: 普通 -->
+      <div class="cust-card">
+        <div class="bd">
+          <div class="cust-row1">
+            <div style="font-size:15px;font-weight:500;color:#1a1a2e">求育儿嫂 · 带6个月宝宝</div>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:#d97706;margin:6px 0">5000元/月</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">白班</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">武侯区</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">单休</span>
+          </div>
+          <div style="font-size:12px;color:#666;padding:6px 0;border-top:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0;margin-bottom:8px">
+            发布方：家家乐家政 · 李经理&nbsp;<span style="padding:3px 10px;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer" onclick="var sub=this.textContent.indexOf('已')>=0;this.textContent=sub?'🔔 订阅':'🔔 已订阅';this.style.cssText=sub?'padding:3px 10px;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer':'padding:3px 10px;background:#ecfdf5;color:#059669;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer';showToast(sub?'已取消订阅':'✅ 已订阅家家乐家政·李经理的岗位发布')">🔔 订阅</span>
+          </div>
+          <div style="font-size:12px;color:#666;margin-bottom:10px;line-height:1.5">带6个月宝宝，白班早8晚6，要求有育儿嫂证</div>
+          <div class="cust-ops">
+            <button class="btn-ok" onclick="toggleStoreBoard(this)">📤 上架门店展板</button>
+            <button class="btn-info" onclick="showModal('resumeModal')">📨 代阿姨投简历</button>
+            <button class="btn-warn" onclick="showModal('posterModal')">📋 岗位海报</button>
+            <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片3: 保洁钟点工 -->
+      <div class="cust-card">
+        <div class="bd">
+          <div class="cust-row1">
+            <div style="font-size:15px;font-weight:500;color:#1a1a2e">求保洁 · 钟点工每周2次</div>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:#d97706;margin:6px 0">2800元/月</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">钟点</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">青羊区</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">每周3小时</span>
+          </div>
+          <div style="font-size:12px;color:#666;padding:6px 0;border-top:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0;margin-bottom:8px">
+            发布方：爱心家政 · 刘经理&nbsp;<span style="padding:3px 10px;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer" onclick="var sub=this.textContent.indexOf('已')>=0;this.textContent=sub?'🔔 订阅':'🔔 已订阅';this.style.cssText=sub?'padding:3px 10px;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer':'padding:3px 10px;background:#ecfdf5;color:#059669;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer';showToast(sub?'已取消订阅':'✅ 已订阅爱心家政·刘经理的岗位发布')">🔔 订阅</span>
+          </div>
+          <div style="font-size:12px;color:#666;margin-bottom:10px;line-height:1.5">每周二四六下午打扫卫生，做2室1厅日常保洁，要求有保洁经验</div>
+          <div class="cust-ops">
+            <button class="btn-ok" onclick="toggleStoreBoard(this)">📤 上架门店展板</button>
+            <button class="btn-info" onclick="showModal('resumeModal')">📨 代阿姨投简历</button>
+            <button class="btn-warn" onclick="showModal('posterModal')">📋 岗位海报</button>
+            <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片4: 护工老人陪护 -->
+      <div class="cust-card" style="border-color:#86efac">
+        <div class="bd">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+            <span style="padding:2px 8px;background:#ecfdf5;color:#059669;border-radius:4px;font-size:10px;font-weight:500">🤖 AI推荐</span>
+            <span style="font-size:11px;color:#059669">你的阿姨有2位匹配</span>
+          </div>
+          <div class="cust-row1">
+            <div style="font-size:15px;font-weight:500;color:#1a1a2e">求护工 · 老人陪护住家</div>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:#d97706;margin:6px 0">6500元/月</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">住家</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">金牛区</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">无休</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">男老人72岁</span>
+          </div>
+          <div style="display:flex;align-items:center;padding:6px 0;margin-bottom:8px;border-top:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0">
+            <div style="font-size:12px;color:#666">发布方：熊猫家政 · 周经理&nbsp;<span style="padding:3px 10px;background:#ecfdf5;color:#059669;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer" onclick="var sub=this.textContent.indexOf('已')>=0;this.textContent=sub?'🔔 订阅':'🔔 已订阅';this.style.cssText=sub?'padding:3px 10px;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer':'padding:3px 10px;background:#ecfdf5;color:#059669;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer';showToast(sub?'已取消订阅':'✅ 已订阅熊猫家政·周经理的岗位发布')">🔔 已订阅</span></div>
+          </div>
+          <div style="font-size:12px;color:#666;margin-bottom:10px;line-height:1.5">男老人72岁能自理，需要做饭做家务陪同散步，有护工经验优先</div>
+          <div class="cust-ops">
+            <button class="btn-ok" onclick="toggleStoreBoard(this)">📤 上架门店展板</button>
+            <button class="btn-info" onclick="showModal('resumeModal')">📨 代阿姨投简历</button>
+            <button class="btn-warn" onclick="showModal('posterModal')">📋 岗位海报</button>
+            <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片5: 月嫂42天 -->
+      <div class="cust-card">
+        <div class="bd">
+          <div class="cust-row1">
+            <div style="font-size:15px;font-weight:500;color:#1a1a2e">求月嫂 · 42天住家</div>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:#d97706;margin:6px 0">12000元/月</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">住家</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">高新区</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">预产期8月</span>
+            <span style="padding:2px 8px;background:#f8fafc;border-radius:4px;font-size:11px;color:#666">双胞胎</span>
+          </div>
+          <div style="font-size:12px;color:#666;padding:6px 0;border-top:1px solid #f0f0f0;border-bottom:1px solid #f0f0f0;margin-bottom:8px">
+            发布方：安心家政 · 王经理&nbsp;<span style="padding:3px 10px;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer" onclick="var sub=this.textContent.indexOf('已')>=0;this.textContent=sub?'🔔 订阅':'🔔 已订阅';this.style.cssText=sub?'padding:3px 10px;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer':'padding:3px 10px;background:#ecfdf5;color:#059669;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer';showToast(sub?'已取消订阅':'✅ 已订阅安心家政·王经理的岗位发布')">🔔 订阅</span>
+          </div>
+          <div style="font-size:12px;color:#666;margin-bottom:10px;line-height:1.5">预产期8月，双胞胎找月嫂42天住家，有双胞胎护理经验优先，包吃住</div>
+          <div class="cust-ops">
+            <button class="btn-ok" onclick="toggleStoreBoard(this)">📤 上架门店展板</button>
+            <button class="btn-info" onclick="showModal('resumeModal')">📨 代阿姨投简历</button>
+            <button class="btn-warn" onclick="showModal('posterModal')">📋 岗位海报</button>
+            <button class="btn-gray" onclick="showToast('📞 正在拨出虚拟号联系发布方...')">📞</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== Tab1: 我的发布 ===== -->
+  <div class="coop-tab-content" id="coopTab1" style="display:none">
+    <!-- 客户统计入口 -->
+    <div onclick="goPage('page-customer')" style="cursor:pointer;text-decoration:none;margin-bottom:10px">
+      <div style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="width:36px;height:36px;border-radius:50%;background:#4f46e5;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px">👥</span>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:#4338ca">全部客户 <strong>38</strong> 人</div>
+            <div style="font-size:11px;color:#6366f1;margin-top:1px">已发岗位 5 · 待跟进 12</div>
+          </div>
+        </div>
+        <span style="font-size:12px;color:#4f46e5;font-weight:500">查看全部 ›</span>
+      </div>
+    </div>
+    <div class="cust-list" style="margin-top:4px">
+      <div class="cust-card" style="cursor:pointer" onclick="goPage('page-cust-detail')">
+        <div class="bd">
+          <div class="cust-row1">
+            <div><div class="nm" style="font-size:14px">求育儿嫂 · 带6个月宝宝</div></div>
+            <span class="tag info" style="font-size:11px">招聘中</span>
+          </div>
+          <div class="cust-info"><span>5000元/月</span><span>白班 · 单休</span><span>武侯区</span><span>张秀英女士</span></div>
+          <!-- 投递待处理 -->
+          <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:#fef2f2;border-radius:6px;margin-bottom:8px;cursor:pointer" onclick="event.stopPropagation();goPage('page-coop-hall');setTimeout(function(){switchCoopTab(document.querySelector('#coopTabs span:nth-child(3)'),2)},100)">
+            <span style="font-size:12px">📨</span>
+            <span style="font-size:12px;color:#dc2626"><strong>2</strong> 份简历待处理</span>
+            <span style="font-size:11px;color:#999;margin-left:auto">查看 ›</span>
+          </div>
+          <div style="font-size:12px;padding:8px 10px;background:#f8fafc;border-radius:8px;margin-bottom:10px;border-left:3px solid #c7d2fe;color:#999">
+            <span style="font-size:10px;color:#4f46e5">🔒 CRM</span> 雇主：张秀英 138****5678 | 已电话沟通
+          </div>
+          <div class="cust-ops">
+            <button class="btn-info" onclick="event.stopPropagation();toggleMatch(this)" style="cursor:pointer">🤖 查看匹配</button>
+            <button class="btn-gray" onclick="event.stopPropagation()">下架大厅</button>
+            <button class="btn-warn" onclick="event.stopPropagation();showModal('posterModal')">📋 岗位海报</button>
+            <button class="btn-gray" onclick="event.stopPropagation()">⋯</button>
+          </div>
+          <!-- AI匹配阿姨（默认隐藏） -->
+          <div class="job-match" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0">
+            <div style="font-size:12px;font-weight:500;color:#4338ca;margin-bottom:8px">🤖 AI推荐阿姨 · 按匹配度排序</div>
+            <div class="match-batch" id="matchBatch1">
+              <div onclick="event.stopPropagation();goPage('page-worker-delivery-detail')" style="display:flex;align-items:center;gap:10px;padding:10px;background:#f0fdf4;border-radius:8px;border:1px solid #86efac;cursor:pointer;margin-bottom:6px">
+                <div style="width:36px;height:36px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#15803d">王</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:#1a1a2e">王桂芳</div>
+                  <div style="font-size:11px;color:#999">育儿嫂 · 5年经验 · 🚌 32分钟</div>
+                  <div style="font-size:10px;color:#6366f1;margin-top:2px">维护：家家乐家政 · 李经理</div>
+                </div>
+                <div style="text-align:right">
+                  <span style="padding:2px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:10px;font-weight:500">96%</span>
+                  <div style="font-size:10px;color:#999;margin-top:4px">档案 ›</div>
+                </div>
+              </div>
+              <div onclick="event.stopPropagation();goPage('page-worker-delivery-detail')" style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;margin-bottom:6px">
+                <div style="width:36px;height:36px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#92400e">李</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:#1a1a2e">李秀兰</div>
+                  <div style="font-size:11px;color:#999">月嫂 · 8年经验 · 🚌 45分钟</div>
+                  <div style="font-size:10px;color:#6366f1;margin-top:2px">维护：放心家政 · 陈经理</div>
+                </div>
+                <div style="text-align:right">
+                  <span style="padding:2px 8px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:10px;font-weight:500">92%</span>
+                  <div style="font-size:10px;color:#999;margin-top:4px">档案 ›</div>
+                </div>
+              </div>
+              <div onclick="event.stopPropagation();goPage('page-worker-delivery-detail')" style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer">
+                <div style="width:36px;height:36px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#2563eb">张</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:#1a1a2e">张小红</div>
+                  <div style="font-size:11px;color:#999">育儿嫂 · 2年经验 · 🚌 58分钟</div>
+                  <div style="font-size:10px;color:#6366f1;margin-top:2px">维护：熊猫家政 · 周经理</div>
+                </div>
+                <div style="text-align:right">
+                  <span style="padding:2px 8px;background:#dbeafe;color:#2563eb;border-radius:4px;font-size:10px;font-weight:500">88%</span>
+                  <div style="font-size:10px;color:#999;margin-top:4px">档案 ›</div>
+                </div>
+              </div>
+            </div>
+            <!-- 第二批（初始隐藏） -->
+            <div class="match-batch" id="matchBatch2" style="display:none">
+              <div onclick="event.stopPropagation();goPage('page-worker-delivery-detail')" style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;margin-bottom:6px">
+                <div style="width:36px;height:36px;border-radius:50%;background:#fce7f3;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#db2777">赵</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:#1a1a2e">赵红梅</div>
+                  <div style="font-size:11px;color:#999">育儿嫂 · 8年经验 · 🚌 20分钟</div>
+                  <div style="font-size:10px;color:#6366f1;margin-top:2px">维护：爱心家政 · 刘经理</div>
+                </div>
+                <div style="text-align:right">
+                  <span style="padding:2px 8px;background:#fce7f3;color:#db2777;border-radius:4px;font-size:10px;font-weight:500">85%</span>
+                  <div style="font-size:10px;color:#999;margin-top:4px">档案 ›</div>
+                </div>
+              </div>
+              <div onclick="event.stopPropagation();goPage('page-worker-delivery-detail')" style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer">
+                <div style="width:36px;height:36px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#0369a1">吴</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:#1a1a2e">吴秀英</div>
+                  <div style="font-size:11px;color:#999">护工 · 5年经验 · 🚌 15分钟</div>
+                  <div style="font-size:10px;color:#6366f1;margin-top:2px">维护：安心家政 · 张经理</div>
+                </div>
+                <div style="text-align:right">
+                  <span style="padding:2px 8px;background:#e0f2fe;color:#0369a1;border-radius:4px;font-size:10px;font-weight:500">82%</span>
+                  <div style="font-size:10px;color:#999;margin-top:4px">档案 ›</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:6px 10px;background:#f0fdf4;border-radius:6px;font-size:11px;color:#065f46;display:flex;align-items:center;gap:6px;margin-top:8px">
+              <span>💡</span>点击阿姨可查看档案，邀约请联系维护经理
+            </div>
+            <div style="text-align:center;margin-top:8px">
+              <span class="match-switch" id="matchSwitchBtn" onclick="event.stopPropagation();switchMatchBatch()" style="display:inline-block;padding:6px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;font-size:12px;color:#4f46e5;cursor:pointer">🔄 换一批</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cust-card" style="cursor:pointer" onclick="goPage('page-cust-detail')">
+        <div class="bd">
+          <div class="cust-row1">
+            <div><div class="nm" style="font-size:14px">求月嫂 · 26天住家</div></div>
+            <span class="tag ok" style="font-size:11px">已完成</span>
+          </div>
+          <div class="cust-info"><span>8800元/月</span><span>住家</span><span>锦江区</span><span>已安排阿姨</span></div>
+          <div class="cust-ops">
+            <button class="btn-gray" onclick="event.stopPropagation()">查看详情</button>
+            <button class="btn-gray" onclick="event.stopPropagation()">📞</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Tab2: 投递管理 ===== -->
+  <div class="coop-tab-content" id="coopTab2" style="display:none">
+    <!-- 统计数据 -->
+    <div style="display:flex;gap:8px;margin:8px 0 12px">
+      <div style="flex:1;padding:10px 0;background:#fef2f2;border-radius:8px;text-align:center">
+        <div style="font-size:18px;font-weight:700;color:#ef4444">2</div>
+        <div style="font-size:10px;color:#ef4444">待处理</div>
+      </div>
+      <div style="flex:1;padding:10px 0;background:#f0fdf4;border-radius:8px;text-align:center">
+        <div style="font-size:18px;font-weight:700;color:#059669">1</div>
+        <div style="font-size:10px;color:#059669">已面试</div>
+      </div>
+      <div style="flex:1;padding:10px 0;background:#f8fafc;border-radius:8px;text-align:center">
+        <div style="font-size:18px;font-weight:700;color:#6b7280">0</div>
+        <div style="font-size:10px;color:#6b7280">已通过</div>
+      </div>
+    </div>
+    <!-- 投递列表 -->
+    <div class="cust-list">
+      <!-- 投递1 -->
+      <div class="cust-card" style="border-color:#fca5a5">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar">
+              <div class="av" style="background:#dcfce7;color:#15803d">王</div>
+              <div><div class="nm">王桂芳</div><div class="ph">育儿嫂 · 5年经验</div></div>
+            </div>
+            <div style="display:flex;gap:4px">
+              <span style="padding:2px 6px;background:#eef2ff;color:#4f46e5;border-radius:4px;font-size:9px">自投递</span>
+              <span style="padding:3px 8px;background:#fee2e2;color:#dc2626;border-radius:4px;font-size:10px;font-weight:500">待处理</span>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#666;margin:6px 0">
+            投递岗位：<span style="color:#4f46e5">求育儿嫂 · 带6个月宝宝</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:4px 0">
+            <span style="color:#999">📨 今天 14:32 · AI匹配度 95%</span>
+            <span style="color:#6366f1">维护：家家乐家政 · 李经理 📞</span>
+          </div>
+          <div class="cust-ops" style="margin-top:6px">
+            <button class="btn-ok" style="flex:1" onclick="showToast('✅ 已标记为待面试')">✓ 邀约面试</button>
+            <button class="btn-gray" style="flex:1" onclick="showToast('已不合适，拒绝')">✕ 不合适</button>
+            <button class="btn-info" onclick="goPage('page-worker-delivery-detail')">档案</button>
+          </div>
+        </div>
+      </div>
+      <!-- 投递2 -->
+      <div class="cust-card" style="border-color:#fca5a5">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar">
+              <div class="av" style="background:#fef3c7;color:#92400e">李</div>
+              <div><div class="nm">李秀兰</div><div class="ph">月嫂 · 8年经验</div></div>
+            </div>
+            <div style="display:flex;gap:4px">
+              <span style="padding:2px 6px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:9px">代投递</span>
+              <span style="padding:3px 8px;background:#fee2e2;color:#dc2626;border-radius:4px;font-size:10px;font-weight:500">待处理</span>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#666;margin:6px 0">
+            投递岗位：<span style="color:#4f46e5">求月嫂 · 26天住家</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:4px 0">
+            <span style="color:#999">📨 昨天 16:20 · AI匹配度 92%</span>
+            <span style="color:#6366f1">维护：放心家政 · 陈经理 📞</span>
+          </div>
+          <div class="cust-ops" style="margin-top:6px">
+            <button class="btn-ok" style="flex:1" onclick="showToast('✅ 已标记为待面试')">✓ 邀约面试</button>
+            <button class="btn-gray" style="flex:1" onclick="showToast('已不合适，拒绝')">✕ 不合适</button>
+            <button class="btn-info" onclick="goPage('page-worker-delivery-detail')">档案</button>
+          </div>
+        </div>
+      </div>
+      <!-- 投递3 -->
+      <div class="cust-card" style="border-color:#86efac;opacity:0.7">
+        <div class="bd">
+          <div class="cust-row1">
+            <div class="cust-avatar">
+              <div class="av" style="background:#dbeafe;color:#2563eb">张</div>
+              <div><div class="nm">张小红</div><div class="ph">育儿嫂 · 2年经验</div></div>
+            </div>
+            <div style="display:flex;gap:4px">
+              <span style="padding:2px 6px;background:#eef2ff;color:#4f46e5;border-radius:4px;font-size:9px">自投递</span>
+              <span style="padding:3px 8px;background:#d1fae5;color:#059669;border-radius:4px;font-size:10px;font-weight:500">已面试</span>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#666;margin:6px 0">
+            投递岗位：<span style="color:#4f46e5">求育儿嫂 · 带6个月宝宝</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:4px 0">
+            <span style="color:#999">📨 昨天 10:00 面试 · 待客户确认</span>
+            <span style="color:#6366f1">维护：安心家政 · 张经理 📞</span>
+          </div>
+          <div class="cust-ops" style="margin-top:6px">
+            <button class="btn-ok" style="flex:1" onclick="showToast('✅ 已确认通过')">✓ 确认通过</button>
+            <button class="btn-gray" style="flex:1">📞 联系客户</button>
+            <button class="btn-info" onclick="goPage('page-worker-delivery-detail')">档案</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 录入阿姨 ==================== -->
+<div id="page-add-worker" class="page">
+  <div class="page-header">
+    <div class="tit" onclick="goBack()">&larr; 录入阿姨</div>
+    <div style="font-size:12px;color:#999;cursor:pointer" onclick="alert('🤖 AI语音录入：说话就能录入阿姨简历，就像和AI聊天一样简单')">🤖 AI语音录入</div>
+  </div>
+  <div class="form-section">
+    <div class="st">基本信息</div>
+    <div class="form-row"><input class="form-field" placeholder="姓名 *"><input class="form-field" placeholder="电话 *"></div>
+    <div class="form-row"><input class="form-field" placeholder="年龄"><input class="form-field" placeholder="籍贯"></div>
+    <div class="form-row"><input class="form-field" placeholder="微信号"><div class="form-field picker"><span>来源</span><span class="ar">▼</span></div></div>
+  </div>
+  <div class="form-section">
+    <div class="st">技能与经验</div>
+    <div class="form-row"><div class="form-field picker"><span>服务类型</span><span class="ar">▼</span></div><input class="form-field" placeholder="工作年限"></div>
+    <div class="form-row"><input class="form-field" placeholder="期望薪资（元/月）"><div class="form-field picker"><span>住家偏好</span><span class="ar">▼</span></div></div>
+    <div class="form-section">
+      <div class="st">证书</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="padding:4px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;color:#666;cursor:pointer">月嫂证</span>
+        <span style="padding:4px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;color:#666;cursor:pointer">育儿嫂证</span>
+        <span style="padding:4px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;color:#666;cursor:pointer">健康证</span>
+        <span style="padding:4px 10px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:6px;font-size:11px;color:#4f46e5;cursor:pointer">+ 添加</span>
+      </div>
+    </div>
+  </div>
+  <div class="form-btns">
+    <button class="btn-save" onclick="showToast('已保存草稿')">保存草稿</button>
+    <button class="btn-pub" onclick="showToast('✅ 已保存并发布到阿姨库');goPage('page-dashboard')">保存并发布到阿姨库</button>
+  </div>
+</div>
+
+<!-- ==================== 数据报表 ==================== -->
+<div id="page-report" class="page">
+  <div class="page-header">
+    <div class="tit" onclick="goBack()">&larr; 数据报表</div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-card bd-blue"><div class="label">本月成交</div><div class="num" style="color:#4f46e5">12</div><div class="extra">↑ 上月 +3</div></div>
+    <div class="stat-card bd-green"><div class="label">本月营收</div><div class="num" style="color:#059669">¥18,600</div><div class="extra">合作红包 ¥528 · 课程分成 ¥0</div></div>
+  </div>
+  <div class="stat-grid" style="margin-bottom:0">
+    <div class="stat-card"><div class="label">新增客户</div><div class="num">8</div><div class="extra">本月</div></div>
+    <div class="stat-card"><div class="label">新增阿姨</div><div class="num">15</div><div class="extra">共享+私库</div></div>
+  </div>
+  <!-- 接单趋势图 -->
+  <div style="margin-top:16px">
+    <div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:10px">近7天接单趋势</div>
+    <div style="background:#fff;border-radius:10px;border:1px solid #f0f0f0;padding:16px">
+      <div style="display:flex;align-items:flex-end;gap:6px;height:100px;padding-bottom:20px;border-bottom:1px solid #f0f0f0">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <span style="font-size:10px;color:#4f46e5;margin-bottom:4px">2</span>
+          <div style="width:100%;max-width:32px;height:40px;background:linear-gradient(180deg,#4f46e5,#818cf8);border-radius:4px 4px 0 0"></div>
+          <span style="font-size:10px;color:#999;margin-top:6px">04/28</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <span style="font-size:10px;color:#4f46e5;margin-bottom:4px">1</span>
+          <div style="width:100%;max-width:32px;height:20px;background:linear-gradient(180deg,#4f46e5,#818cf8);border-radius:4px 4px 0 0"></div>
+          <span style="font-size:10px;color:#999;margin-top:6px">04/29</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <span style="font-size:10px;color:#4f46e5;margin-bottom:4px">3</span>
+          <div style="width:100%;max-width:32px;height:60px;background:linear-gradient(180deg,#4f46e5,#818cf8);border-radius:4px 4px 0 0"></div>
+          <span style="font-size:10px;color:#999;margin-top:6px">04/30</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <span style="font-size:10px;color:#4f46e5;margin-bottom:4px">0</span>
+          <div style="width:100%;max-width:32px;height:4px;background:#e2e8f0;border-radius:4px 4px 0 0"></div>
+          <span style="font-size:10px;color:#999;margin-top:6px">05/01</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <span style="font-size:10px;color:#ef4444;margin-bottom:4px">-1</span>
+          <div style="width:100%;max-width:32px;height:14px;background:linear-gradient(180deg,#ef4444,#f87171);border-radius:4px 4px 0 0"></div>
+          <span style="font-size:10px;color:#999;margin-top:6px">05/04</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <span style="font-size:10px;color:#4f46e5;margin-bottom:4px">3</span>
+          <div style="width:100%;max-width:32px;height:60px;background:linear-gradient(180deg,#4f46e5,#818cf8);border-radius:4px 4px 0 0"></div>
+          <span style="font-size:10px;color:#999;margin-top:6px">05/05</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <span style="font-size:10px;color:#4f46e5;margin-bottom:4px">1</span>
+          <div style="width:100%;max-width:32px;height:20px;background:linear-gradient(180deg,#4f46e5,#818cf8);border-radius:4px 4px 0 0"></div>
+          <span style="font-size:10px;color:#999;margin-top:6px">05/06</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+          <span style="font-size:10px;color:#4f46e5;margin-bottom:4px">2</span>
+          <div style="width:100%;max-width:32px;height:40px;background:linear-gradient(180deg,#4f46e5,#818cf8);border-radius:4px 4px 0 0"></div>
+          <span style="font-size:10px;color:#4f46e5;font-weight:500;margin-top:6px">今天</span>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:#999">
+        <span>📈 本周累计接单 11 单</span>
+        <span>📊 日均 1.6 单</span>
+      </div>
+    </div>
+  </div>
+  <!-- 收入明细 -->
+  <div style="margin-top:14px">
+    <div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:10px">收入明细</div>
+    <div style="background:#fff;border-radius:10px;border:1px solid #f0f0f0;overflow:hidden">
+      <div style="display:flex;padding:12px 14px;border-bottom:1px solid #f0f0f0;justify-content:space-between;align-items:center">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:16px">🤝</span>
+          <div><div style="font-size:13px;font-weight:500;color:#333">合作红包收入</div><div style="font-size:11px;color:#999">合单成功后释放</div></div>
+        </div>
+        <div style="text-align:right"><div style="font-size:15px;font-weight:600;color:#059669">¥528</div><div style="font-size:10px;color:#bbb">本月</div></div>
+      </div>
+      <div style="display:flex;padding:12px 14px;justify-content:space-between;align-items:center">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:16px">🎓</span>
+          <div><div style="font-size:13px;font-weight:500;color:#333">课程分成收入</div><div style="font-size:11px;color:#999">阿姨购课 · 维护经理得50%</div></div>
+        </div>
+        <div style="text-align:right"><div style="font-size:15px;font-weight:600;color:#059669">¥0</div><div style="font-size:10px;color:#bbb">本月</div></div>
+      </div>
+    </div>
+  </div>
+  <!-- 阿姨状态分布 -->
+  <div style="margin-top:14px">
+    <div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:10px">阿姨状态分布</div>
+    <div style="background:#fff;border-radius:10px;border:1px solid #f0f0f0;padding:14px;display:flex;gap:10px">
+      <div style="flex:1;text-align:center;padding:8px 0;background:#f0fdf4;border-radius:8px"><div style="font-size:18px;font-weight:700;color:#16a34a">42</div><div style="font-size:10px;color:#16a34a">待岗中</div></div>
+      <div style="flex:1;text-align:center;padding:8px 0;background:#eff6ff;border-radius:8px"><div style="font-size:18px;font-weight:700;color:#2563eb">98</div><div style="font-size:10px;color:#2563eb">上户中</div></div>
+      <div style="flex:1;text-align:center;padding:8px 0;background:#f8fafc;border-radius:8px"><div style="font-size:18px;font-weight:700;color:#6b7280">16</div><div style="font-size:10px;color:#6b7280">已转行</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 阿姨详情 ==================== -->
+<div id="page-worker-detail" class="page">
+  <div class="page-header">
+    <div class="tit" onclick="goBack()">&larr; 王桂芳 · 档案</div>
+    <div class="act"><span>编辑</span><span style="color:#ef4444">分配</span></div>
+  </div>
+  <div class="detail-header">
+    <div class="av" style="background:#dcfce7;color:#15803d">王</div>
+    <div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="nm">王桂芳</span>
+        <span class="tag ok">待岗中</span>
+        <span style="padding:2px 6px;background:#eef2ff;color:#4f46e5;border-radius:4px;font-size:9px">共享</span>
+      </div>
+      <div class="ph">138****5678 · 育儿嫂 · 5年经验</div>
+    </div>
+    <div class="ops">
+      <button class="btn-ok" style="padding:6px 12px;border:none;border-radius:8px;font-size:12px;cursor:pointer" onclick="showToast('📞 联系维护经理：家家乐家政 · 李经理 138****9999')">联系维护经理</button>
+      <button class="btn-gray" style="padding:6px 12px;border:none;border-radius:8px;font-size:12px;cursor:pointer">📞</button>
+    </div>
+  </div>
+  <div class="info-bar">
+    <div><span class="l">期望：</span>5000元/月</div><div><span class="l">住家：</span>均可</div>
+    <div><span class="l">区域：</span>锦江区</div><div><span class="l">状态：</span>待岗中 — 可接单</div>
+    <div><span class="l">来源：</span>海报扫码 · 2026-04-28</div>
+    <div><span class="l">维护经理：</span><span style="color:#4f46e5">家家乐家政 · 李经理 📞</span></div>
+  </div>
+  <div class="detail-tabs" id="wdTabs">
+    <div class="on" onclick="switchWdTab(this,0)">基本信息</div>
+    <div onclick="switchWdTab(this,1)">技能证书</div>
+    <div onclick="switchWdTab(this,2)">工作照片</div>
+    <div onclick="switchWdTab(this,3)">跟进记录 3</div>
+    <div onclick="switchWdTab(this,4)">通话记录 5</div>
+    <div onclick="switchWdTab(this,5)">合作管理</div>
+    <div onclick="switchWdTab(this,6)">工作记录</div>
+  </div>
+
+  <!-- Tab0: 基本信息 -->
+  <div class="wd-tab" id="wdTab0" style="padding:12px 0">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:#f8fafc;padding:10px;border-radius:8px"><div style="font-size:11px;color:#999">年龄</div><div style="font-size:14px;font-weight:500;color:#1a1a2e;margin-top:2px">38岁</div></div>
+      <div style="background:#f8fafc;padding:10px;border-radius:8px"><div style="font-size:11px;color:#999">籍贯</div><div style="font-size:14px;font-weight:500;color:#1a1a2e;margin-top:2px">四川资阳</div></div>
+      <div style="background:#f8fafc;padding:10px;border-radius:8px"><div style="font-size:11px;color:#999">学历</div><div style="font-size:14px;font-weight:500;color:#1a1a2e;margin-top:2px">初中</div></div>
+      <div style="background:#f8fafc;padding:10px;border-radius:8px"><div style="font-size:11px;color:#999">语言</div><div style="font-size:14px;font-weight:500;color:#1a1a2e;margin-top:2px">普通话</div></div>
+    </div>
+    <div style="background:#f8fafc;padding:10px;border-radius:8px;margin-bottom:12px">
+      <div style="font-size:11px;color:#999;margin-bottom:4px">证书</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <span style="padding:3px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:10px">育儿嫂证 ✓</span>
+        <span style="padding:3px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:10px">健康证 ✓</span>
+        <span style="padding:3px 8px;background:#f8fafc;color:#999;border:1px dashed #ddd;border-radius:4px;font-size:10px">+ 添加</span>
+      </div>
+    </div>
+    <div style="background:#f8fafc;padding:10px;border-radius:8px">
+      <div style="font-size:11px;color:#999;margin-bottom:4px">工作经历</div>
+      <div style="font-size:12px;color:#666;line-height:1.6">
+        <div style="margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #f0f0f0"><span style="font-weight:500">2023-2025</span> 锦江区李女士家 · 育儿嫂 · 带1岁半宝宝</div>
+        <div><span style="font-weight:500">2020-2023</span> 武侯区张先生家 · 育儿嫂 · 带新生儿</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab1: 技能证书 -->
+  <div class="wd-tab" id="wdTab1" style="display:none;padding:12px 0">
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px">已认证证书</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px">
+        <span style="font-size:18px">📜</span><div style="flex:1"><div style="font-size:13px;font-weight:500;color:#1a1a2e">育儿嫂证</div><div style="font-size:11px;color:#999">2023-05 颁发 · 编号: YEX2023****</div></div>
+        <span style="padding:2px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:10px">已认证</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px">
+        <span style="font-size:18px">🩺</span><div style="flex:1"><div style="font-size:13px;font-weight:500;color:#1a1a2e">健康证</div><div style="font-size:11px;color:#999">2025-12 体检 · 有效期至2026-12</div></div>
+        <span style="padding:2px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:10px">有效</span>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding:10px;border:1px dashed #ddd;border-radius:8px;text-align:center;font-size:12px;color:#999;cursor:pointer">+ 上传新证书</div>
+  </div>
+
+  <!-- Tab2: 工作照片 -->
+  <div class="wd-tab" id="wdTab2" style="display:none;padding:12px 0">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div style="height:100px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer">🏠</div>
+      <div style="height:100px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer">👶</div>
+      <div style="height:100px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer">🍳</div>
+      <div style="height:100px;border:1px dashed #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#ccc;cursor:pointer">+</div>
+    </div>
+  </div>
+
+  <!-- Tab3: 跟进记录 -->
+  <div class="wd-tab" id="wdTab3" style="display:none;padding:12px 0">
+    <div class="follow-list" style="padding:0">
+      <div class="fl-item">
+        <div class="fl-av" style="background:#eef2ff;color:#4f46e5">张</div>
+        <div style="flex:1"><div class="fl-top"><span class="fl-name">张经理</span><span class="fl-time">昨天 15:30</span></div><div class="fl-text">和阿姨沟通了育儿嫂岗位需求，阿姨表示愿意接单，已推荐给雇主安排面试。</div><span class="fl-way">📞 电话沟通</span></div>
+      </div>
+      <div class="fl-item">
+        <div class="fl-av" style="background:#eef2ff;color:#4f46e5">张</div>
+        <div style="flex:1"><div class="fl-top"><span class="fl-name">张经理</span><span class="fl-time">04-28 10:00</span></div><div class="fl-text">阿姨通过海报扫码注册，电话联系确认基本信息，已引导完善简历。</div><span class="fl-way">💬 微信沟通</span></div>
+      </div>
+    </div>
+    <div class="follow-input" style="padding:8px 0 0">
+      <div class="ways"><span class="on">电话</span><span>微信</span><span>面谈</span></div>
+      <input placeholder="写跟进内容..."><button class="send">发送</button>
+    </div>
+  </div>
+
+  <!-- Tab4: 通话记录 -->
+  <div class="wd-tab" id="wdTab4" style="display:none;padding:8px 0">
+    <div class="call-card alert">
+      <div class="top">
+        <div class="caller"><span style="font-size:14px">📞</span><div><div class="nm">张经理 → 王桂芳</div><div class="tm">05-07 14:32 · 03:24</div></div></div>
+        <span class="ai-tag">AI分析</span>
+      </div>
+      <div class="ai-text">🤖 AI检测到阿姨在通话中表示"我已经在雇主家上户了"</div>
+      <div class="ai-meta"><span>关键词：已上户</span><span>置信度 92%</span><span style="margin-left:auto;color:#4f46e5;cursor:pointer">▶ 听取片段</span></div>
+    </div>
+    <div class="call-card normal">
+      <div class="top">
+        <div class="caller"><span style="font-size:14px">📞</span><div><div class="nm">李经理 → 王桂芳</div><div class="tm">05-06 09:15 · 02:08</div></div></div>
+        <span class="ai-tag">AI分析</span>
+      </div>
+      <div class="summary">未检测到状态变更 · 通话摘要：沟通育儿嫂岗位详情</div>
+    </div>
+  </div>
+
+  <!-- Tab5: 合作管理 -->
+  <div class="wd-tab" id="wdTab5" style="display:none;padding:12px 0">
+    <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">阿姨归属</div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:6px"><span>维护经理</span><span style="font-weight:500;color:#1a1a2e">安心家政 · 张经理</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:6px"><span>阿姨库类型</span><span style="font-weight:500;color:#1a1a2e">共享库（可合作）</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#666"><span>合作红包</span><span style="font-weight:500;color:#1a1a2e">88元 · 签约即冻结</span></div>
+    </div>
+    <!-- 课程分成 -->
+    <div style="background:#f0fdf4;border:1px solid #a7f3d0;border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:500;color:#065f46;margin-bottom:6px">🎓 课程分成</div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:4px"><span>阿姨购买课程时</span><span style="font-weight:500;color:#16a34a">您可获得课程费 50%</span></div>
+      <div style="font-size:11px;color:#999">该阿姨在自习室每购买一门付费课程，您作为维护经理将获得课程费用50%的分成</div>
+    </div>
+    <div style="background:#f8fafc;border-radius:8px;padding:12px">
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">合作历史</div>
+      <div style="font-size:12px;color:#999">暂无合作记录</div>
+    </div>
+  </div>
+
+  <!-- Tab6: 工作记录 -->
+  <div class="wd-tab" id="wdTab6" style="display:none;padding:12px 0">
+    <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">当前上户</div>
+      <div style="font-size:12px;color:#999">当前待岗中，暂无上户记录</div>
+    </div>
+    <div style="background:#f8fafc;border-radius:8px;padding:12px">
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">历史订单</div>
+      <div style="font-size:12px;color:#666;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #f0f0f0">
+        <div><span style="font-weight:500">锦江区李女士家</span> · 育儿嫂 · 2023-03 至 2025-01</div>
+        <div style="color:#999;margin-top:2px">客户评价：⭐⭐⭐⭐⭐ 非常有耐心，宝宝很喜欢</div>
+      </div>
+      <div style="font-size:12px;color:#666">
+        <div><span style="font-weight:500">武侯区张先生家</span> · 育儿嫂 · 2020-06 至 2022-12</div>
+        <div style="color:#999;margin-top:2px">客户评价：⭐⭐⭐⭐ 工作认真负责</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 投递阿姨档案(简化版) ==================== -->
+<div id="page-worker-delivery-detail" class="page">
+  <div class="page-header">
+    <div class="tit" onclick="goBack()">&larr; 李秀兰 · 档案</div>
+  </div>
+  <div class="detail-header">
+    <div class="av" style="background:#fef3c7;color:#92400e">李</div>
+    <div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="nm">李秀兰</span>
+        <span class="tag ok">待岗中</span>
+        <span style="padding:2px 6px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:9px">共享</span>
+      </div>
+      <div class="ph">月嫂 · 8年经验</div>
+    </div>
+    <div class="ops">
+      <button class="btn-gray" style="padding:6px 14px;border:none;border-radius:8px;font-size:12px;cursor:pointer" onclick="showToast('📞 正在拨出虚拟号...')">📞 虚拟号联系</button>
+    </div>
+  </div>
+  <div class="info-bar">
+    <div><span class="l">期望：</span>8000元/月</div><div><span class="l">住家：</span>均可</div>
+    <div><span class="l">区域：</span>锦江区</div><div><span class="l">状态：</span>待岗中 — 可接单</div>
+    <div><span class="l">来源：</span>公司录入 · 2023-03-15</div>
+    <div><span class="l">维护经理：</span><span style="color:#4f46e5">放心家政 · 陈经理</span></div>
+  </div>
+  <div class="detail-tabs" id="wdDeliveryTabs">
+    <div class="on" onclick="switchWdDeliveryTab(this,0)">基本信息</div>
+    <div onclick="switchWdDeliveryTab(this,1)">技能证书</div>
+    <div onclick="switchWdDeliveryTab(this,2)">工作照片</div>
+    <div onclick="switchWdDeliveryTab(this,3)">工作记录</div>
+  </div>
+
+  <!-- Tab0: 基本信息 -->
+  <div class="wd-tab" id="wdDeliveryTab0" style="padding:12px 0">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:#f8fafc;padding:10px;border-radius:8px"><div style="font-size:11px;color:#999">年龄</div><div style="font-size:14px;font-weight:500;color:#1a1a2e;margin-top:2px">42岁</div></div>
+      <div style="background:#f8fafc;padding:10px;border-radius:8px"><div style="font-size:11px;color:#999">籍贯</div><div style="font-size:14px;font-weight:500;color:#1a1a2e;margin-top:2px">四川成都</div></div>
+      <div style="background:#f8fafc;padding:10px;border-radius:8px"><div style="font-size:11px;color:#999">学历</div><div style="font-size:14px;font-weight:500;color:#1a1a2e;margin-top:2px">高中</div></div>
+      <div style="background:#f8fafc;padding:10px;border-radius:8px"><div style="font-size:11px;color:#999">语言</div><div style="font-size:14px;font-weight:500;color:#1a1a2e;margin-top:2px">普通话 · 四川话</div></div>
+    </div>
+    <div style="background:#f8fafc;padding:10px;border-radius:8px;margin-bottom:12px">
+      <div style="font-size:11px;color:#999;margin-bottom:4px">证书</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <span style="padding:3px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:10px">月嫂证 ✓</span>
+        <span style="padding:3px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:10px">健康证 ✓</span>
+        <span style="padding:3px 8px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:10px">催乳师证</span>
+      </div>
+    </div>
+    <div style="background:#f8fafc;padding:10px;border-radius:8px">
+      <div style="font-size:11px;color:#999;margin-bottom:4px">工作经历</div>
+      <div style="font-size:12px;color:#666;line-height:1.6">
+        <div style="margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #f0f0f0"><span style="font-weight:500">2022-2025</span> 武侯区王先生家 · 月嫂 · 26天住家 · 照顾产妇和新生儿</div>
+        <div style="margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #f0f0f0"><span style="font-weight:500">2019-2021</span> 锦江区刘女士家 · 月嫂 · 42天住家 · 双胞胎护理</div>
+        <div><span style="font-weight:500">2017-2019</span> 青羊区陈女士家 · 月嫂 · 26天住家</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab1: 技能证书 -->
+  <div class="wd-tab" id="wdDeliveryTab1" style="display:none;padding:12px 0">
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px">已认证证书</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px">
+        <span style="font-size:18px">📜</span><div style="flex:1"><div style="font-size:13px;font-weight:500;color:#1a1a2e">月嫂证（高级）</div><div style="font-size:11px;color:#999">2022-03 颁发 · 编号: YS2022****</div></div>
+        <span style="padding:2px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:10px">已认证</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px">
+        <span style="font-size:18px">🩺</span><div style="flex:1"><div style="font-size:13px;font-weight:500;color:#1a1a2e">健康证</div><div style="font-size:11px;color:#999">2025-12 体检 · 有效期至2026-12</div></div>
+        <span style="padding:2px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:10px">有效</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px">
+        <span style="font-size:18px">🍼</span><div style="flex:1"><div style="font-size:13px;font-weight:500;color:#1a1a2e">催乳师证</div><div style="font-size:11px;color:#999">2023-06 颁发 · 含手法认证</div></div>
+        <span style="padding:2px 8px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:10px">已认证</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab2: 工作照片 -->
+  <div class="wd-tab" id="wdDeliveryTab2" style="display:none;padding:12px 0">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div style="height:100px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer">🏠</div>
+      <div style="height:100px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer">👶</div>
+      <div style="height:100px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer">🍳</div>
+    </div>
+  </div>
+
+  <!-- Tab3: 工作记录 -->
+  <div class="wd-tab" id="wdDeliveryTab3" style="display:none;padding:12px 0">
+    <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">当前上户</div>
+      <div style="font-size:12px;color:#999">当前待岗中，可接月嫂单</div>
+    </div>
+    <div style="background:#f8fafc;border-radius:8px;padding:12px">
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">历史订单</div>
+      <div style="font-size:12px;color:#666;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #f0f0f0">
+        <div><span style="font-weight:500">武侯区王先生家</span> · 月嫂 · 26天 · 2022-03 至 2025-01</div>
+        <div style="color:#999;margin-top:2px">客户评价：⭐⭐⭐⭐⭐ 非常专业，产妇恢复很好</div>
+      </div>
+      <div style="font-size:12px;color:#666;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #f0f0f0">
+        <div><span style="font-weight:500">锦江区刘女士家</span> · 月嫂 · 42天双胞胎 · 2019-06 至 2021-12</div>
+        <div style="color:#999;margin-top:2px">客户评价：⭐⭐⭐⭐⭐ 带双胞胎经验丰富，很尽责</div>
+      </div>
+      <div style="font-size:12px;color:#666">
+        <div><span style="font-weight:500">青羊区陈女士家</span> · 月嫂 · 26天 · 2017-08 至 2019-02</div>
+        <div style="color:#999;margin-top:2px">客户评价：⭐⭐⭐⭐ 工作认真负责，厨艺好</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 我的 ==================== -->
+<div id="page-profile" class="page">
+  <div class="page-header">
+    <div class="tit" onclick="goBack()">&larr; 我的</div>
+  </div>
+  <!-- 账号信息 -->
+  <div style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-radius:16px;padding:20px;text-align:center;margin-bottom:16px">
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#6366f1);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;font-weight:500">张</div>
+    <div style="font-size:18px;font-weight:600;color:#1a1a2e">张经理</div>
+    <div style="font-size:13px;color:#6366f1;margin-top:2px">安心家政 · 家政经理</div>
+    <div style="display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <span style="padding:4px 12px;background:rgba(255,255,255,.7);border-radius:12px;font-size:11px;color:#4f46e5">📱 已实名</span>
+      <span style="padding:4px 12px;background:rgba(255,255,255,.7);border-radius:12px;font-size:11px;color:#4f46e5">🏅 标准版套餐</span>
+      <span style="padding:4px 12px;background:rgba(255,255,255,.7);border-radius:12px;font-size:11px;color:#4f46e5">🔄 会员至 2026-12</span>
+    </div>
+  </div>
+  <!-- 数据概要 -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+    <div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center">
+      <div style="font-size:18px;font-weight:700;color:#4f46e5">128</div>
+      <div style="font-size:11px;color:#999">共享阿姨</div>
+    </div>
+    <div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center">
+      <div style="font-size:18px;font-weight:700;color:#4f46e5">38</div>
+      <div style="font-size:11px;color:#999">服务客户</div>
+    </div>
+    <div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center">
+      <div style="font-size:18px;font-weight:700;color:#4f46e5">12</div>
+      <div style="font-size:11px;color:#999">本月成交</div>
+    </div>
+  </div>
+  <!-- 菜单 -->
+  <div style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;overflow:hidden;margin-bottom:16px">
+    <div style="display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="alert('套餐管理')">
+      <span style="font-size:18px;margin-right:12px">📦</span>
+      <div style="flex:1"><div style="font-size:14px;font-weight:500;color:#1a1a2e">套餐管理</div><div style="font-size:12px;color:#999">标准版 · 查看详情</div></div>
+      <span style="color:#ccc;font-size:16px">›</span>
+    </div>
+    <div style="display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="alert('账号安全')">
+      <span style="font-size:18px;margin-right:12px">🔒</span>
+      <div style="flex:1"><div style="font-size:14px;font-weight:500;color:#1a1a2e">账号安全</div><div style="font-size:12px;color:#999">修改密码 · 绑定手机</div></div>
+      <span style="color:#ccc;font-size:16px">›</span>
+    </div>
+    <div style="display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="alert('消息通知设置')">
+      <span style="font-size:18px;margin-right:12px">🔔</span>
+      <div style="flex:1"><div style="font-size:14px;font-weight:500;color:#1a1a2e">消息通知</div><div style="font-size:12px;color:#999">电话提醒 · 微信通知</div></div>
+      <span style="color:#ccc;font-size:16px">›</span>
+    </div>
+    <div style="display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="alert('帮助中心')">
+      <span style="font-size:18px;margin-right:12px">❓</span>
+      <div style="flex:1"><div style="font-size:14px;font-weight:500;color:#1a1a2e">帮助中心</div><div style="font-size:12px;color:#999">使用指南 · 联系客服</div></div>
+      <span style="color:#ccc;font-size:16px">›</span>
+    </div>
+    <div style="display:flex;align-items:center;padding:14px 16px;cursor:pointer" onclick="alert('退出登录')">
+      <span style="font-size:18px;margin-right:12px">🚪</span>
+      <div style="flex:1"><div style="font-size:14px;font-weight:500;color:#ef4444">退出登录</div></div>
+      <span style="color:#ccc;font-size:16px">›</span>
+    </div>
+  </div>
+  <div style="text-align:center;font-size:11px;color:#ccc;padding-bottom:20px">
+    熊猫家政 v1.0.0 · 家政经理端
+  </div>
+</div>
+
+<!-- ==================== 代阿姨投简历弹窗 ==================== -->
+<div id="resumeModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-hd"><div class="tit">📨 代阿姨投简历</div><div class="cls" onclick="hideModal('resumeModal')">取消</div></div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:#666;margin-bottom:12px">以下阿姨AI匹配此岗位，选择后投递简历给发布方</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer">
+          <input type="checkbox" style="width:16px;height:16px;accent-color:#4f46e5" onchange="updateResumeCount()">
+          <div style="width:36px;height:36px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#15803d">王</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500;color:#4f46e5;cursor:pointer" onclick="event.stopPropagation();hideModal('resumeModal');goPage('page-worker-detail')">王桂芳 ↗</div>
+            <div style="font-size:11px;color:#999">育儿嫂 · 5年经验 · 🚌 32分钟</div>
+          </div>
+          <span style="padding:2px 8px;background:#dcfce7;color:#15803d;border-radius:4px;font-size:10px;font-weight:500">95%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer">
+          <input type="checkbox" style="width:16px;height:16px;accent-color:#4f46e5" onchange="updateResumeCount()">
+          <div style="width:36px;height:36px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#92400e">李</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500;color:#4f46e5;cursor:pointer" onclick="event.stopPropagation();hideModal('resumeModal');goPage('page-worker-detail')">李秀兰 ↗</div>
+            <div style="font-size:11px;color:#999">月嫂 · 8年经验 · 🚌 45分钟</div>
+          </div>
+          <span style="padding:2px 8px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:10px;font-weight:500">92%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;opacity:0.5">
+          <input type="checkbox" style="width:16px;height:16px" onchange="updateResumeCount()">
+          <div style="width:36px;height:36px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#bbb">张</div>
+          <div style="flex:1">
+            <div style="font-size:13px;color:#999;cursor:pointer" onclick="event.stopPropagation();hideModal('resumeModal');goPage('page-worker-detail')">张小红 ↗</div>
+            <div style="font-size:11px;color:#ccc">育儿嫂 · 2年经验 · 🚌 58分钟</div>
+          </div>
+          <span style="padding:2px 8px;background:#f0f0f0;color:#bbb;border-radius:4px;font-size:10px">65%</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-back" onclick="hideModal('resumeModal')">取消</button>
+      <button class="btn-confirm" id="resumeConfirmBtn" onclick="var cbs=document.querySelectorAll('#resumeModal input[type=checkbox]:checked');if(cbs.length===0){showToast('请至少选择一位阿姨');return}hideModal('resumeModal');showToast('✅ 已投递'+cbs.length+'份简历')">投递所选简历</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 岗位海报弹窗 ==================== -->
+<div id="posterModal" class="modal poster-modal" onclick="hideModal('posterModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div style="width:100%;text-align:right;padding:0 0 8px">
+      <span onclick="hideModal('posterModal')" style="color:#999;font-size:13px;cursor:pointer">取消</span>
+    </div>
+    <div class="poster">
+      <div class="poster-brand">
+        <div class="name">熊猫家政</div>
+        <div class="by">安心家政 · 张经理 发布</div>
+      </div>
+      <div class="poster-job">
+        <div class="title-row">
+          <div><div class="title">急招育儿嫂</div><div class="sub">带6个月宝宝 · 白班</div></div>
+          <div class="salary">5000元/月</div>
+        </div>
+        <div class="tags"><span>白班 · 早8晚6</span><span>单休</span><span>成都市武侯区</span></div>
+        <div class="req">
+          <div class="rl">岗位要求</div>
+          <div class="rv">· 有育儿嫂证、健康证<br>· 1年以上带宝宝经验<br>· 年龄45岁以下</div>
+        </div>
+        <div class="foot"><span>📍 武侯区桐梓林</span><span>📅 尽快上户</span></div>
+      </div>
+      <div class="poster-divider"></div>
+      <div class="poster-qr">
+        <div class="poster-qr-code">
+          <svg viewBox="0 0 100 100" width="58" height="58"><rect width="100" height="100" fill="#fff"/><rect x="5" y="5" width="20" height="20" fill="#1a1a2e" rx="3"/><rect x="30" y="5" width="15" height="20" fill="#1a1a2e"/><rect x="50" y="5" width="20" height="15" fill="#1a1a2e"/><rect x="75" y="5" width="20" height="20" fill="#1a1a2e" rx="3"/><rect x="5" y="30" width="20" height="15" fill="#1a1a2e"/><rect x="50" y="25" width="15" height="15" fill="#1a1a2e"/><rect x="70" y="30" width="15" height="20" fill="#1a1a2e"/><rect x="5" y="50" width="20" height="20" fill="#1a1a2e"/><rect x="30" y="50" width="15" height="10" fill="#1a1a2e"/><rect x="55" y="50" width="10" height="20" fill="#1a1a2e"/><rect x="70" y="55" width="20" height="15" fill="#1a1a2e"/><rect x="5" y="75" width="20" height="20" fill="#1a1a2e" rx="3"/><rect x="30" y="65" width="15" height="20" fill="#1a1a2e"/><rect x="55" y="75" width="20" height="15" fill="#1a1a2e"/><rect x="80" y="75" width="15" height="20" fill="#1a1a2e"/><rect x="38" y="38" width="24" height="24" fill="#fff"/><rect x="42" y="42" width="16" height="16" fill="#1a1a2e"/></svg>
+        </div>
+        <div class="poster-qr-text">
+          <div style="font-size:12px;font-weight:600;color:#1a1a2e;margin-bottom:2px">扫码查看更多岗位</div>
+          <div style="font-size:10px;color:#999">长按识别 · 直接联系张经理</div>
+        </div>
+      </div>
+      <div class="poster-foot">熊猫家政 · 让找工作更简单</div>
+    </div>
+    <div class="poster-actions">
+      <button class="save" onclick="showToast('✅ 海报已保存到相册')">保存到相册</button>
+      <button class="share" onclick="hideModal('posterModal')">分享到微信</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 全局底部导航 ===== -->
+<div class="global-nav">
+  <div class="nav-item act" data-page="page-dashboard" onclick="goPage('page-dashboard')">
+    <span class="icon">🏠</span><span class="label">首页</span>
+  </div>
+  <div class="nav-item" data-page="page-coop-hall" onclick="goPage('page-coop-hall')">
+    <span class="icon">📋</span><span class="label">岗位</span>
+  </div>
+  <div class="nav-item" data-page="page-worker" onclick="goPage('page-worker')">
+    <span class="icon">👩</span><span class="label">阿姨</span>
+  </div>
+  <div class="nav-item" data-page="page-profile" onclick="goPage('page-profile')">
+    <span class="icon">👤</span><span class="label">我的</span>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ===== 页面导航历史 =====
+var pageHistory = [];
+
+function goPage(id){
+  // 记录历史（不重复记录连续相同页面）
+  var activePage = document.querySelector('.page.active');
+  if(activePage) {
+    var prevId = activePage.id;
+    if(prevId !== id) pageHistory.push(prevId);
+  }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  var navMap = {
+    'page-add-cust':'page-coop-hall','page-cust-detail':'page-coop-hall',
+    'page-customer':'page-coop-hall',
+    'page-add-worker':'page-worker','page-report':'page-dashboard',
+    'page-services':'page-dashboard',
+    'page-worker-detail':'page-worker',
+    'page-worker-delivery-detail':'page-coop-hall'
+  };
+  var navId = navMap[id] || id;
+  document.querySelectorAll('.global-nav .nav-item').forEach(function(n){
+    n.classList.toggle('act', n.getAttribute('data-page')===navId);
+  });
+  window.scrollTo(0,0);
+}
+
+// ===== 返回上一页（支持历史栈） =====
+function goBack(){
+  if(pageHistory.length > 0) {
+    var backTo = pageHistory.pop();
+    goPage(backTo);
+  } else {
+    goPage('page-dashboard');
+  }
+}
+function showModal(id){
+  document.getElementById(id).classList.add('show');
+}
+function hideModal(id){
+  document.getElementById(id).classList.remove('show');
+}
+function switchCoopTab(el, idx){
+  document.querySelectorAll('#coopTabs span').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.coop-tab-content').forEach(c=>c.style.display='none');
+  document.getElementById('coopTab'+idx).style.display='block';
+}
+function switchWorkerTab(el, idx){
+  document.querySelectorAll('#workerTabs span').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.worker-tab-content').forEach(c=>c.style.display='none');
+  document.getElementById('workerTab'+idx).style.display='block';
+}
+function toggleStoreBoard(btn){
+  if(btn.classList.contains('on')){
+    showConfirm('确认下架该岗位？\n下架后该岗位将不在门店展板中展示。',function(){
+      btn.classList.remove('on');
+      btn.innerHTML='📤 上架门店展板';
+      btn.style.cssText='';
+      showToast('✅ 已下架门店展板');
+    });
+  }else{
+    btn.classList.add('on');
+    btn.innerHTML='✅ 已上架门店展板';
+    btn.style.background='#dcfce7';
+    btn.style.color='#15803d';
+    btn.style.borderColor='#bbf7d0';
+    btn.style.fontWeight='500';
+    showToast('✅ 已上架到门店展板');
+  }
+}
+function updateResumeCount(){
+  var cbs = document.querySelectorAll('#resumeModal input[type=checkbox]');
+  var cnt = 0;
+  cbs.forEach(function(cb){if(cb.checked) cnt++;});
+  var btn = document.getElementById('resumeConfirmBtn');
+  if(btn) btn.textContent = cnt > 0 ? '投递所选简历（'+cnt+'人）' : '投递所选简历';
+}
+function switchWdTab(el, idx){
+  document.querySelectorAll('#wdTabs div').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.wd-tab').forEach(c=>c.style.display='none');
+  document.getElementById('wdTab'+idx).style.display='block';
+}
+function switchWdDeliveryTab(el, idx){
+  document.querySelectorAll('#wdDeliveryTabs div').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('#page-worker-delivery-detail .wd-tab').forEach(c=>c.style.display='none');
+  document.getElementById('wdDeliveryTab'+idx).style.display='block';
+}
+
+// ===== 展开/收起AI匹配（岗位→阿姨） =====
+function toggleMatch(el){
+  var card = el.closest('.cust-card') || el.parentElement;
+  var matchDiv = card.querySelector('.job-match');
+  if(matchDiv){
+    var isHidden = matchDiv.style.display === 'none';
+    matchDiv.style.display = isHidden ? 'block' : 'none';
+    el.textContent = isHidden ? '🤖 收起匹配' : '🤖 查看匹配';
+    if(isHidden){ resetMatchBatches(); }
+  }
+}
+function resetMatchBatches(){
+  var b1 = document.getElementById('matchBatch1');
+  var b2 = document.getElementById('matchBatch2');
+  var sw = document.getElementById('matchSwitchBtn');
+  if(b1) b1.style.display = 'block';
+  if(b2) b2.style.display = 'none';
+  if(sw) sw.textContent = '🔄 换一批';
+}
+// ===== 换一批（岗位→阿姨） =====
+function switchMatchBatch(){
+  var b1 = document.getElementById('matchBatch1');
+  var b2 = document.getElementById('matchBatch2');
+  var sw = document.getElementById('matchSwitchBtn');
+  if(!b1 || !b2) return;
+  var showingFirst = b1.style.display !== 'none';
+  b1.style.display = showingFirst ? 'none' : 'block';
+  b2.style.display = showingFirst ? 'block' : 'none';
+  if(sw) sw.textContent = showingFirst ? '🔄 上一批' : '🔄 换一批';
+}
+
+// ===== 展开/收起推荐岗位（阿姨→岗位） =====
+function toggleWorkerJobMatch(el){
+  var card = el.closest('.cust-card') || el.parentElement;
+  var matchDiv = card.querySelector('.worker-job-match');
+  if(matchDiv){
+    var isHidden = matchDiv.style.display === 'none';
+    matchDiv.style.display = isHidden ? 'block' : 'none';
+    el.textContent = isHidden ? '收起推荐' : '推荐岗位';
+    if(isHidden){ resetWjmBatches(); }
+  }
+}
+function resetWjmBatches(){
+  var b1 = document.getElementById('wjmBatch1');
+  var b2 = document.getElementById('wjmBatch2');
+  var sw = document.getElementById('wjmSwitchBtn');
+  if(b1) b1.style.display = 'block';
+  if(b2) b2.style.display = 'none';
+  if(sw) sw.textContent = '🔄 换一批';
+}
+// ===== 换一批（阿姨→岗位） =====
+function switchWjmBatch(){
+  var b1 = document.getElementById('wjmBatch1');
+  var b2 = document.getElementById('wjmBatch2');
+  var sw = document.getElementById('wjmSwitchBtn');
+  if(!b1 || !b2) return;
+  var showingFirst = b1.style.display !== 'none';
+  b1.style.display = showingFirst ? 'none' : 'block';
+  b2.style.display = showingFirst ? 'block' : 'none';
+  if(sw) sw.textContent = showingFirst ? '🔄 上一批' : '🔄 换一批';
+}
+function filterWorkerTab(filter, el){
+  var cards = document.querySelectorAll('#workerList .cust-card');
+  var isPool = filter==='shared'||filter==='private';
+  cards.forEach(function(c){
+    if(filter==='all'){c.style.display='block';return}
+    if(isPool){c.style.display=(c.getAttribute('data-pool')===filter?'block':'none')}
+    else{c.style.display=(c.getAttribute('data-status')===filter?'block':'none')}
+  });
+  document.querySelectorAll('#workerFilters span').forEach(function(f){
+    f.style.background='#f8fafc';f.style.color='#999';f.style.fontWeight='400'
+  });
+  el.style.background='#eef2ff';el.style.color='#4f46e5';el.style.fontWeight='500';
+}
+function showToast(msg){
+  var t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;z-index:9999;animation:fadeIn .2s;pointer-events:none';
+  document.body.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(function(){t.remove()},400)},1800);
+}
+function searchWorker(val){
+  var kw=val.trim().toLowerCase();
+  document.querySelectorAll('#workerList .cust-card').forEach(function(c){
+    c.style.display=!kw||c.textContent.toLowerCase().indexOf(kw)>-1?'':'none';
+  });
+}
+function searchCust(val){
+  var kw=val.trim().toLowerCase();
+  document.querySelectorAll('#page-customer .cust-card').forEach(function(c){
+    c.style.display=!kw||c.textContent.toLowerCase().indexOf(kw)>-1?'':'none';
+  });
+}
+function searchCoop(val){
+  var kw=val.trim().toLowerCase();
+  document.querySelectorAll('#page-coop-hall .cust-card').forEach(function(c){
+    c.style.display=!kw||c.textContent.toLowerCase().indexOf(kw)>-1?'':'none';
+  });
+}
+function switchCdTab(el, idx){
+  document.querySelectorAll('#cdTabs div').forEach(function(t){t.classList.remove('on')});
+  el.classList.add('on');
+  document.querySelectorAll('.cd-tab').forEach(function(t){t.style.display='none'});
+  document.getElementById('cdTab'+idx).style.display='block';
+}
+
+// ===== 同城阿姨筛选 =====
+function filterCityWorker(filter, el){
+  var cards = document.querySelectorAll('#cityWorkerList .cust-card');
+  cards.forEach(function(c){
+    if(filter==='all'){c.style.display='block';return}
+    c.style.display=(c.getAttribute('data-service')===filter?'block':'none');
+  });
+  var parent = el.parentNode;
+  parent.querySelectorAll('span').forEach(function(f){
+    f.style.background='#f8fafc';f.style.color='#999';f.style.fontWeight='400';
+  });
+  el.style.background='#eef2ff';el.style.color='#4f46e5';el.style.fontWeight='500';
+}
+
+// ===== 全局搜索 =====
+function globalSearch(val) {
+  var kw = val.trim().toLowerCase();
+  if(!kw) { showToast('🔍 输入关键词搜索客户、阿姨或岗位'); return; }
+  // 跳转到客户管理页
+  goPage('page-customer');
+  var custSearch = document.querySelector('#page-customer .search-bar input');
+  if(custSearch) {
+    custSearch.value = kw;
+    searchCust(kw);
+  }
+}
+// ===== 自定义确认弹窗 =====
+var _confirmCb=null;
+function showConfirm(msg, cb){
+  _confirmCb=cb;
+  var m=document.getElementById('confirmModal');
+  document.getElementById('confirmMsg').textContent=msg;
+  m.classList.add('show');
+}
+function hideConfirm(ok){
+  document.getElementById('confirmModal').classList.remove('show');
+  if(ok&&_confirmCb) _confirmCb();
+  _confirmCb=null;
+}
+</script>
+<!-- ==================== 自定义确认弹窗 ==================== -->
+<div id="confirmModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-body" style="text-align:center;padding:20px 20px 16px">
+      <div id="confirmMsg" style="font-size:14px;color:#1a1a2e;line-height:1.5;font-weight:500"></div>
+    </div>
+    <div style="display:flex;border-top:1px solid #f0f0f0;font-size:15px">
+      <button onclick="hideConfirm(false)" style="flex:1;padding:12px 0;border:none;border-right:1px solid #f0f0f0;background:#fff;color:#666;cursor:pointer;border-radius:0 0 0 14px;font-size:14px">取消</button>
+      <button onclick="hideConfirm(true)" style="flex:1;padding:12px 0;border:none;background:#fff;color:#ef4444;cursor:pointer;font-weight:500;border-radius:0 0 14px 0;font-size:14px">确认下架</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
