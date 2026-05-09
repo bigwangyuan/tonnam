@@ -332,7 +332,7 @@ textarea.form-field{resize:none;font-family:inherit;width:100%}
         <span style="flex:1;font-size:12px;color:#666">3 份阿姨简历待审核</span>
         <span style="font-size:11px;color:#4f46e5;font-weight:500;flex-shrink:0">去处理 ›</span>
       </div>
-      <div onclick="goPage('page-worker');setTimeout(function(){switchWorkerTab(document.querySelector('#workerTabs span:nth-child(3)'),2)},100)" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f8f8f8;cursor:pointer">
+      <div onclick="goPage('page-worker');setTimeout(function(){switchWorkerTab(document.querySelector('#workerTabs span:nth-child(6)'),5)},100)" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f8f8f8;cursor:pointer">
         <span style="width:5px;height:5px;background:#f59e0b;border-radius:50%;flex-shrink:0"></span>
         <span style="flex:1;font-size:12px;color:#666">2 个岗位匹配到新阿姨</span>
         <span style="font-size:11px;color:#4f46e5;font-weight:500;flex-shrink:0">查看 ›</span>
@@ -555,9 +555,10 @@ textarea.form-field{resize:none;font-family:inherit;width:100%}
   <div class="worker-tabs" id="workerTabs">
     <span class="on" onclick="switchWorkerTab(this,0)">同城阿姨</span>
     <span onclick="switchWorkerTab(this,1)">我的阿姨 156</span>
-    <span onclick="switchWorkerTab(this,2)">匹配岗位</span>
+    <span onclick="switchWorkerTab(this,2)">📨 应聘追踪</span>
     <span onclick="switchWorkerTab(this,3)">待完善简历 3</span>
     <span onclick="switchWorkerTab(this,4)" style="color:#dc2626">待审批状态 2</span>
+    <span onclick="switchWorkerTab(this,5)">匹配岗位</span>
   </div>
   <div class="search-bar" style="margin-top:12px"><input placeholder="搜索阿姨姓名、电话..." oninput="searchWorker(this.value)"></div>
 
@@ -758,7 +759,7 @@ textarea.form-field{resize:none;font-family:inherit;width:100%}
             </div>
             <div class="cust-tags">
               <span class="tag ok">待岗中</span>
-              <span style="padding:2px 6px;background:#eef2ff;color:#4f46e5;border-radius:4px;font-size:9px">共享</span>
+              <span style="padding:2px 6px;background:#eef2ff;color:#4f46e5;border-radius:4px;font-size:9px;cursor:pointer" onclick="event.stopPropagation();confirmUnshare('王桂芳')" title="点击取消共享">共享</span>
             </div>
           </div>
           <div class="cust-info"><span>育儿嫂</span><span>5年经验</span><span>期望5000+</span><span>已实名 ✓</span></div>
@@ -851,7 +852,7 @@ textarea.form-field{resize:none;font-family:inherit;width:100%}
             </div>
             <div class="cust-tags">
               <span class="tag ok">待岗中</span>
-              <span style="padding:2px 6px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:9px">私库</span>
+              <span style="padding:2px 6px;background:#fef3c7;color:#92400e;border-radius:4px;font-size:9px;cursor:pointer" onclick="event.stopPropagation();confirmShare('李秀兰',false)" title="点击加入共享库">私库</span>
             </div>
           </div>
           <div class="cust-info"><span>月嫂</span><span>8年经验</span><span>期望8000+</span></div>
@@ -872,7 +873,7 @@ textarea.form-field{resize:none;font-family:inherit;width:100%}
             </div>
             <div class="cust-tags">
               <span style="padding:2px 6px;background:#dbeafe;color:#2563eb;border-radius:4px;font-size:10px">上户中</span>
-              <span style="padding:2px 6px;background:#eef2ff;color:#4f46e5;border-radius:4px;font-size:9px">共享</span>
+              <span style="padding:2px 6px;background:#eef2ff;color:#4f46e5;border-radius:4px;font-size:9px;cursor:pointer" onclick="event.stopPropagation();confirmUnshare('张小红')" title="点击取消共享">共享</span>
             </div>
           </div>
           <div class="cust-info"><span>育儿嫂</span><span>雇主：锦江区李女士</span><span>2026-04-15起</span></div>
@@ -886,9 +887,217 @@ textarea.form-field{resize:none;font-family:inherit;width:100%}
     </div>
   </div>
 
-    <!-- Tab2: 匹配岗位 -->
+    <!-- Tab2: 应聘追踪 -->
   <div class="worker-tab-content" id="workerTab2" style="display:none">
-    <!-- AI摘要 -->
+    <!-- 统计卡片 -->
+    <div style="display:flex;gap:10px;margin:12px 0">
+      <div style="flex:1;background:#fff;border-radius:10px;padding:12px;text-align:center;border:1px solid #fef3c7">
+        <div style="font-size:22px;font-weight:700;color:#d97706">3</div>
+        <div style="font-size:11px;color:#999">待联系</div>
+      </div>
+      <div style="flex:1;background:#fff;border-radius:10px;padding:12px;text-align:center;border:1px solid #dbeafe">
+        <div style="font-size:22px;font-weight:700;color:#2563eb">2</div>
+        <div style="font-size:11px;color:#999">已沟通</div>
+      </div>
+      <div style="flex:1;background:#fff;border-radius:10px;padding:12px;text-align:center;border:1px solid #fee2e2">
+        <div style="font-size:22px;font-weight:700;color:#ef4444">1</div>
+        <div style="font-size:11px;color:#999">已关闭</div>
+      </div>
+    </div>
+    <!-- 筛选 -->
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+      <span onclick="filterApplications('all',this)" style="padding:5px 12px;background:#eef2ff;color:#4f46e5;border-radius:14px;font-size:11px;font-weight:500;cursor:pointer">全部</span>
+      <span onclick="filterApplications('pending',this)" style="padding:5px 12px;background:#f8fafc;color:#999;border-radius:14px;font-size:11px;cursor:pointer">待联系</span>
+      <span onclick="filterApplications('contacted',this)" style="padding:5px 12px;background:#f8fafc;color:#999;border-radius:14px;font-size:11px;cursor:pointer">已沟通</span>
+      <span onclick="filterApplications('closed',this)" style="padding:5px 12px;background:#f8fafc;color:#999;border-radius:14px;font-size:11px;cursor:pointer">已关闭</span>
+    </div>
+    <!-- 应聘列表 -->
+    <div class="cust-list" id="applicationList">
+      <!-- 应聘1：待联系 -->
+      <div class="cust-card" data-status="pending" data-worker="陈美兰">
+        <div class="bd">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:36px;height:36px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#15803d;flex-shrink:0">陈</div>
+              <div>
+                <div style="font-size:14px;font-weight:500;color:#1a1a2e">陈美兰</div>
+                <div style="font-size:11px;color:#999">月嫂 · 6年经验 · 38岁</div>
+              </div>
+            </div>
+            <span style="padding:3px 10px;background:#fef3c7;color:#d97706;border-radius:12px;font-size:11px;font-weight:500;white-space:nowrap">⏳ 待联系</span>
+          </div>
+          <div style="padding:10px;background:#f8fafc;border-radius:8px;margin-bottom:8px">
+            <div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:4px">📋 投递岗位：【住家保姆】三室一厅 照顾1岁宝宝</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#666">
+              <span>🏠 住家</span><span>👶 带小孩</span><span>💰 6000/月</span><span>📍 五缘湾</span>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:6px;font-size:11px;color:#999">
+              <span>🏢 发布方：安心家政 · 张经理</span>
+              <span>📅 5月9日 14:30</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#eef2ff;color:#4f46e5" onclick="showToast('📞 正在拨打安心家政-张经理虚拟号...')">📞 联系对方经理</button>
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#ecfdf5;color:#059669" onclick="goPage('page-worker-detail')">📋 阿姨档案</button>
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#f5f5f5;color:#999" onclick="showConfirm('📤','下架展板','确认从门店展板下架此岗位？',()=>showToast('✅ 已下架'))">📤 下架</button>
+          </div>
+        </div>
+      </div>
+      <!-- 应聘2：待联系（同城合作） -->
+      <div class="cust-card" data-status="pending" data-worker="王桂芳">
+        <div class="bd">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:36px;height:36px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#15803d;flex-shrink:0">王</div>
+              <div>
+                <div style="font-size:14px;font-weight:500;color:#1a1a2e">王桂芳</div>
+                <div style="font-size:11px;color:#999">育儿嫂 · 5年经验 · 42岁</div>
+              </div>
+            </div>
+            <span style="padding:3px 10px;background:#fef3c7;color:#d97706;border-radius:12px;font-size:11px;font-weight:500;white-space:nowrap">⏳ 待联系</span>
+          </div>
+          <div style="padding:10px;background:#f8fafc;border-radius:8px;margin-bottom:8px">
+            <div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:4px">📋 投递岗位：【白班保姆】四室两厅 日常保洁</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#666">
+              <span>☀️ 白班</span><span>🧹 保洁</span><span>💰 4500/月</span><span>📍 思明区</span>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:6px;font-size:11px;color:#999">
+              <span>🏢 发布方：家家乐家政 · 李经理</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#eef2ff;color:#4f46e5" onclick="showToast('📞 正在拨打家家乐家政-李经理虚拟号...')">📞 联系对方经理</button>
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#ecfdf5;color:#059669" onclick="goPage('page-worker-detail')">📋 阿姨档案</button>
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#f5f5f5;color:#999" onclick="showConfirm('📤','下架展板','确认从门店展板下架此岗位？',()=>showToast('✅ 已下架'))">📤 下架</button>
+          </div>
+        </div>
+      </div>
+      <!-- 应聘3：已沟通（对方已邀面试） -->
+      <div class="cust-card" data-status="contacted" data-worker="李秀兰">
+        <div class="bd">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:36px;height:36px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#92400e;flex-shrink:0">李</div>
+              <div>
+                <div style="font-size:14px;font-weight:500;color:#1a1a2e">李秀兰</div>
+                <div style="font-size:11px;color:#999">月嫂 · 8年经验 · 45岁</div>
+              </div>
+            </div>
+            <span style="padding:3px 10px;background:#dbeafe;color:#2563eb;border-radius:12px;font-size:11px;font-weight:500;white-space:nowrap">💬 已沟通</span>
+          </div>
+          <div style="padding:10px;background:#f8fafc;border-radius:8px;margin-bottom:8px">
+            <div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:4px">📋 投递岗位：【月嫂】26天住家</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#666">
+              <span>🏠 住家</span><span>👶 新生儿</span><span>💰 8800/26天</span><span>📍 锦江区</span>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:6px;font-size:11px;color:#999">
+              <span>🏢 发布方：本站发布</span>
+              <span>📅 对方面试：5月11日 14:00</span>
+            </div>
+            <div style="margin-top:6px;padding:6px 10px;background:#eff6ff;border-radius:6px;font-size:11px;color:#3b82f6">📝 张经理反馈：已安排面试，等结果通知你</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#eef2ff;color:#4f46e5" onclick="showToast('📞 正在联系对方经理...')">📞 联系对方经理</button>
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#ecfdf5;color:#059669" onclick="goPage('page-worker-detail')">📋 阿姨档案</button>
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#f5f5f5;color:#999" onclick="showConfirm('📤','下架展板','确认从门店展板下架此岗位？',()=>showToast('✅ 已下架'))">📤 下架</button>
+          </div>
+        </div>
+      </div>
+      <!-- 应聘4：已沟通（对方已通过） -->
+      <div class="cust-card" data-status="contacted" data-worker="张秀英">
+        <div class="bd">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:36px;height:36px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#15803d;flex-shrink:0">张</div>
+              <div>
+                <div style="font-size:14px;font-weight:500;color:#1a1a2e">张秀英</div>
+                <div style="font-size:11px;color:#999">保姆 · 3年经验 · 36岁</div>
+              </div>
+            </div>
+            <span style="padding:3px 10px;background:#dbeafe;color:#2563eb;border-radius:12px;font-size:11px;font-weight:500;white-space:nowrap">💬 已沟通</span>
+          </div>
+          <div style="padding:10px;background:#f8fafc;border-radius:8px;margin-bottom:8px">
+            <div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:4px">📋 投递岗位：【钟点工】两小时保洁</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#666">
+              <span>⏰ 钟点</span><span>🧹 保洁</span><span>💰 50/小时</span><span>📍 湖里区</span>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:6px;font-size:11px;color:#999">
+              <span>🏢 发布方：本站发布</span>
+              <span>📅 对方已录用 · 5月10日上户</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#eef2ff;color:#4f46e5" onclick="showToast('📞 正在联系对方经理...')">📞 联系对方经理</button>
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#ecfdf5;color:#059669" onclick="goPage('page-worker-detail')">📋 阿姨档案</button>
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#f5f5f5;color:#999" onclick="showConfirm('📤','下架展板','阿姨已上户，确认从展板下架？',()=>showToast('✅ 已下架'))">📤 下架</button>
+          </div>
+        </div>
+      </div>
+      <!-- 应聘5：待联系（自己发布的岗位） -->
+      <div class="cust-card" data-status="pending" data-worker="赵丽华">
+        <div class="bd">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:36px;height:36px;border-radius:50%;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#4f46e5;flex-shrink:0">赵</div>
+              <div>
+                <div style="font-size:14px;font-weight:500;color:#1a1a2e">赵丽华</div>
+                <div style="font-size:11px;color:#999">护工 · 7年经验 · 50岁</div>
+              </div>
+            </div>
+            <span style="padding:3px 10px;background:#fef3c7;color:#d97706;border-radius:12px;font-size:11px;font-weight:500;white-space:nowrap">⏳ 待联系</span>
+          </div>
+          <div style="padding:10px;background:#f8fafc;border-radius:8px;margin-bottom:8px">
+            <div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:4px">📋 投递岗位：【护工】老人看护 半自理</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#666">
+              <span>🏠 住家</span><span>👴 老人护理</span><span>💰 5500/月</span><span>📍 集美区</span>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:6px;font-size:11px;color:#999">
+              <span>🏢 发布方：安心家政 · 张经理</span>
+              <span>📅 5月8日 10:15</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#eef2ff;color:#4f46e5" onclick="showToast('📞 正在拨打安心家政-张经理虚拟号...')">📞 联系对方经理</button>
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#ecfdf5;color:#059669" onclick="goPage('page-worker-detail')">📋 阿姨档案</button>
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#f5f5f5;color:#999" onclick="showConfirm('📤','下架展板','确认从门店展板下架此岗位？',()=>showToast('✅ 已下架'))">📤 下架</button>
+          </div>
+        </div>
+      </div>
+      <!-- 应聘6：已关闭 -->
+      <div class="cust-card" data-status="closed" style="opacity:0.7" data-worker="刘翠花">
+        <div class="bd">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:36px;height:36px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#bbb;flex-shrink:0">刘</div>
+              <div>
+                <div style="font-size:14px;font-weight:500;color:#999">刘翠花</div>
+                <div style="font-size:11px;color:#bbb">育儿嫂 · 4年经验 · 40岁</div>
+              </div>
+            </div>
+            <span style="padding:3px 10px;background:#fee2e2;color:#ef4444;border-radius:12px;font-size:11px;font-weight:500;white-space:nowrap">🚫 已关闭</span>
+          </div>
+          <div style="padding:10px;background:#f8fafc;border-radius:8px;margin-bottom:8px">
+            <div style="font-size:13px;font-weight:500;color:#999;margin-bottom:4px">📋 投递岗位：【育儿嫂】带6个月双胞胎</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:#bbb">
+              <span>🏠 住家</span><span>👶 带小孩</span><span>💰 7000/月</span><span>📍 武侯区</span>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:6px;font-size:11px;color:#bbb">
+              <span>🏢 发布方：家家乐家政 · 李经理</span>
+              <span>📅 对方已招到人 · 5月5日关闭</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#eef2ff;color:#4f46e5" onclick="showToast('📞 正在拨打家家乐家政-李经理虚拟号...')">📞 联系对方经理</button>
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#ecfdf5;color:#059669" onclick="goPage('page-worker-detail')">📋 阿姨档案</button>
+            <button style="flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;background:#f5f5f5;color:#999" onclick="showConfirm('📤','下架展板','确认从门店展板下架此岗位？',()=>showToast('✅ 已下架'))">📤 下架</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Tab5: 匹配岗位 -->
+  <div class="worker-tab-content" id="workerTab5" style="display:none">
     <div style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-radius:12px;padding:14px;margin:12px 0">
       <div style="font-size:13px;font-weight:500;color:#4338ca;margin-bottom:8px">🤖 AI 匹配分析</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
@@ -1490,7 +1699,7 @@ textarea.form-field{resize:none;font-family:inherit;width:100%}
     </div>
   </div>
   <div class="form-btns">
-    <button class="btn-save" onclick="showToast('已保存草稿')">保存草稿</button>
+    <button class="btn-save" onclick="showToast('✅ 已保存到门店私库')">保存到门店私库</button>
     <button class="btn-pub" onclick="showToast('✅ 已保存并发布到阿姨库');goPage('page-dashboard')">保存并发布到阿姨库</button>
   </div>
 </div>
@@ -2200,6 +2409,21 @@ function filterWorkerTab(filter, el){
   });
   el.style.background='#eef2ff';el.style.color='#4f46e5';el.style.fontWeight='500';
 }
+function filterApplications(filter, el){
+  var cards = document.querySelectorAll('#applicationList .cust-card');
+  cards.forEach(function(c){
+    if(filter==='all'){c.style.display='block';return}
+    c.style.display=(c.getAttribute('data-status')===filter?'block':'none');
+  });
+  // 更新筛选按钮高亮
+  var parent = el.parentElement;
+  if(parent){
+    parent.querySelectorAll('span').forEach(function(f){
+      f.style.background='#f8fafc';f.style.color='#999';f.style.fontWeight='400'
+    });
+  }
+  el.style.background='#eef2ff';el.style.color='#4f46e5';el.style.fontWeight='500';
+}
 function showToast(msg){
   var t=document.createElement('div');
   t.textContent=msg;
@@ -2271,6 +2495,31 @@ function hideConfirm(ok){
   if(ok&&_confirmCb) _confirmCb();
   _confirmCb=null;
 }
+function confirmUnshare(workerName){
+  document.getElementById('confirmMsg').innerHTML='取消共享后，<b>'+workerName+'</b>将放回私库管理<br><br><span style="font-size:12px;color:#999">私库阿姨：</span><br><span style="font-size:12px;color:#999">• 无法查看、投递门店展板信息</span><br><span style="font-size:12px;color:#999">• 再次共享时可能失去优先维护人权限</span>';
+  document.getElementById('confirmBtn').textContent='取消共享';
+  document.getElementById('confirmBtn').style.color='#dc2626';
+  document.getElementById('confirmBtn').style.fontWeight='700';
+  _confirmCb=function(){document.getElementById('confirmBtn').textContent='确认下架';document.getElementById('confirmBtn').style.color='#ef4444';document.getElementById('confirmBtn').style.fontWeight='500';showToast('✅ 已取消'+workerName+'的共享')};
+  document.getElementById('confirmModal').classList.add('show');
+}
+function confirmShare(workerName, alreadyShared){
+  if(alreadyShared){
+    showToast('⚠️ '+workerName+' 已存在共享库中，无法重复共享');
+    return;
+  }
+  document.getElementById('confirmMsg').innerHTML='确认将<b>'+workerName+'</b>加入共享库？<br><br><span style="font-size:12px;color:#999">共享后其他家政公司可查看该阿姨简历<br>并申请合作</span>';
+  document.getElementById('confirmBtn').textContent='确认共享';
+  document.getElementById('confirmBtn').style.color='#059669';
+  document.getElementById('confirmBtn').style.fontWeight='700';
+  _confirmCb=function(){
+    document.getElementById('confirmBtn').textContent='确认下架';
+    document.getElementById('confirmBtn').style.color='#ef4444';
+    document.getElementById('confirmBtn').style.fontWeight='500';
+    showToast('✅ '+workerName+' 已加入共享库');
+  };
+  document.getElementById('confirmModal').classList.add('show');
+}
 </script>
 <!-- ==================== 自定义确认弹窗 ==================== -->
 <div id="confirmModal" class="modal">
@@ -2280,7 +2529,7 @@ function hideConfirm(ok){
     </div>
     <div style="display:flex;border-top:1px solid #f0f0f0;font-size:15px">
       <button onclick="hideConfirm(false)" style="flex:1;padding:12px 0;border:none;border-right:1px solid #f0f0f0;background:#fff;color:#666;cursor:pointer;border-radius:0 0 0 14px;font-size:14px">取消</button>
-      <button onclick="hideConfirm(true)" style="flex:1;padding:12px 0;border:none;background:#fff;color:#ef4444;cursor:pointer;font-weight:500;border-radius:0 0 14px 0;font-size:14px">确认下架</button>
+      <button onclick="hideConfirm(true)" id="confirmBtn" style="flex:1;padding:12px 0;border:none;background:#fff;color:#ef4444;cursor:pointer;font-weight:500;border-radius:0 0 14px 0;font-size:14px">确认下架</button>
     </div>
   </div>
 </div>

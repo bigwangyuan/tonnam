@@ -96,7 +96,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
 .job-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:500;display:none}
 .job-modal-overlay.show{display:block}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;max-height:88vh;overflow-y:auto;animation:slideUp .3s;padding-bottom:env(safe-area-inset-bottom,16px)}
+.modal-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;max-height:88vh;overflow-y:auto;animation:slideUp .3s;padding-bottom:env(safe-area-inset-bottom,16px);z-index:501}
 .modal-handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:12px auto 4px}
 .modal-close{position:absolute;top:12px;right:16px;width:32px;height:32px;border-radius:50%;background:#f5f5f5;border:none;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .detail-header{padding:16px 20px;border-bottom:1px solid #f0f0f0}
@@ -146,7 +146,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
 /* 面试详情弹窗 */
 .interview-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:500;display:none}
 .interview-overlay.show{display:block}
-.interview-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;max-height:85vh;overflow-y:auto;animation:slideUp .3s;padding-bottom:env(safe-area-inset-bottom,16px)}
+.interview-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;max-height:85vh;overflow-y:auto;animation:slideUp .3s;padding-bottom:env(safe-area-inset-bottom,16px);z-index:501}
 .interview-sheet .isec{padding:14px 20px;border-bottom:1px solid #f0f0f0}
 .interview-sheet .isec h4{font-size:14px;font-weight:600;color:#333;margin-bottom:10px}
 .intel-item{display:flex;justify-content:space-between;padding:8px 0;font-size:13px;color:#666;border-bottom:1px solid #f8f8f8}
@@ -350,7 +350,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
 /* ===== 课程详情 ===== */
 .course-body{padding:0 0 80px;background:#f5f5f5;overflow-y:auto;flex:1}
 .course-bg{height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;position:relative;flex-shrink:0}
-.course-bg .back-btn{position:absolute;top:44px;left:16px;width:32px;height:32px;background:rgba(0,0,0,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:none;color:#fff}
+.course-bg .back-btn{position:absolute;top:44px;left:12px;background:rgba(0,0,0,.2);border-radius:20px;padding:6px 14px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:none;color:#fff;font-weight:500}
 .course-bg .ct{font-size:22px;font-weight:700;margin-bottom:6px}
 .course-bg .cs{font-size:12px;opacity:.85}
 .course-ct{background:#fff;border-radius:16px 16px 0 0;margin-top:-16px;position:relative;z-index:2;padding:16px 20px}
@@ -374,6 +374,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
 .sec-item .idx{width:24px;height:24px;border-radius:50%;background:#e5e7eb;color:#999;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:12px}
 .sec-item .idx.done{background:#07c160;color:#fff}
 .sec-item .idx.cur{background:#f59e0b;color:#fff}
+.sec-item .idx.locked{background:#f5f5f5;color:#bbb}
+.sec-item.locked .info .tt{color:#bbb}
+.sec-item.locked .info .sub{color:#ddd}
 .sec-item .info{flex:1}
 .sec-item .info .tt{font-size:13px;color:#333;font-weight:500}
 .sec-item .info .sub{font-size:11px;color:#999;margin-top:2px}
@@ -407,6 +410,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
 .pts-val{font-size:15px;font-weight:600;white-space:nowrap}
 .pts-val.plus{color:#07c160}
 .pts-val.minus{color:#ef4444}
+
+/* 待岗打卡动效 */
+@keyframes standbyPulse {
+  0%, 100% { box-shadow: 0 0 18px rgba(34,197,94,.4), 0 0 40px rgba(34,197,94,.1); transform: scale(1); }
+  50% { box-shadow: 0 0 30px rgba(34,197,94,.6), 0 0 60px rgba(34,197,94,.25); transform: scale(1.04); }
+}
+.standby-btn-wrap { display:flex; justify-content:center; align-items:center; padding:20px 0 6px }
+.standby-btn { 
+  width:130px; height:130px; border-radius:50%; border:3px solid rgba(255,255,255,.25);
+  background: linear-gradient(135deg, #22c55e, #059669);
+  color:#fff; font-size:15px; font-weight:700; cursor:pointer;
+  animation: standbyPulse 2.5s ease-in-out infinite;
+  transition: transform .2s;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+}
+.standby-btn:active { transform: scale(.92) }
+.standby-btn .emoji { font-size:32px; line-height:1 }
+.standby-btn .label { font-size:15px; letter-spacing:2px }
 </style>
 </head>
 <body>
@@ -467,17 +488,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
           <span class="match-badge">AI 96%匹配</span>
           <div class="job-ch"><div class="job-t">【住家保姆】三室一厅 照顾1岁宝宝</div><div class="job-s">¥6,000/月</div></div>
           <div class="job-tags"><span class="job-tg">🏠 住家</span><span class="job-tg b">👶 照顾小孩</span><span class="job-tg p">📍 五缘湾</span><span class="job-tg o">📅 立即上岗</span></div>
-          <div class="job-f"><span class="job-co">厦门鹭岛家政公司</span><span class="job-d">📍 距您2.3km</span></div>
+          <div class="job-f"><span class="job-d">📍 距您2.3km</span></div>
         </div>
         <div class="job-c" onclick="showJobDetail(1)">
           <div class="job-ch"><div class="job-t">【白班保姆】四室两厅 日常保洁</div><div class="job-s">¥4,500/月</div></div>
           <div class="job-tags"><span class="job-tg">☀️ 白班</span><span class="job-tg b">🧹 日常保洁</span><span class="job-tg p">📍 思明区</span></div>
-          <div class="job-f"><span class="job-co">好阿姨平台</span><span class="job-d">📍 距您5.1km</span></div>
+          <div class="job-f"><span class="job-d">📍 距您5.1km</span></div>
         </div>
         <div class="job-c" onclick="showJobDetail(2)">
           <div class="job-ch"><div class="job-t">【钟点工】每天2小时 买菜做饭</div><div class="job-s">¥2,800/月</div></div>
           <div class="job-tags"><span class="job-tg">⏰ 钟点</span><span class="job-tg b">🍳 做饭</span><span class="job-tg p">📍 思明区</span></div>
-          <div class="job-f"><span class="job-co">熊猫家政</span><span class="job-d">📍 距您1.8km</span></div>
+          <div class="job-f"><span class="job-d">📍 距您1.8km</span></div>
         </div>
       </div>
       <!-- 筛选无结果 -->
@@ -497,7 +518,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
       <div class="tab-item act" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
       <div class="tab-item" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
       <div class="tab-item" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
-      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>工资</span></div>
       <div class="tab-item" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
     </div>
   </div>
@@ -514,29 +535,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
     <div style="flex:1;overflow-y:auto;background:#f5f5f5;padding:14px 16px 80px">
       <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:14px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;cursor:pointer" onclick="switchPage('points')">
         <div><div style="font-size:12px;color:#92400e">我的积分</div><div style="font-size:24px;font-weight:700;color:#92400e">350</div></div>
-        <div style="text-align:right;font-size:11px;color:#b45309;line-height:1.6">🎯 拉新阿姨 +30分<br>⏰ 每日打卡 +5分</div>
+        <div style="text-align:right;font-size:11px;color:#b45309;line-height:1.6">🎯 拉新阿姨 +30分<br>📚 学完课程 +30分<br>🏅 考过证书 +30分</div>
       </div>
-      <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:10px">热门课程</div>
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer" onclick="showCourseDetail(0)">
-          <div style="height:100px;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:36px">📖</div>
-          <div style="padding:10px 14px"><div style="font-size:13px;font-weight:600;color:#333;margin-bottom:2px">月嫂上户必备91项技能</div><div style="font-size:11px;color:#999">48节课 · ¥980 · ▶免费试听</div></div>
-        </div>
-        <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer" onclick="showCourseDetail(1)">
-          <div style="height:100px;background:linear-gradient(135deg,#9333ea,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:36px">👶</div>
-          <div style="padding:10px 14px"><div style="font-size:13px;font-weight:600;color:#333;margin-bottom:2px">高级育婴师</div><div style="font-size:11px;color:#999">36节课 · ¥980 · ▶免费试听</div></div>
-        </div>
-        <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer" onclick="showCourseDetail(2)">
-          <div style="height:100px;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;font-size:36px">🍼</div>
-          <div style="padding:10px 14px"><div style="font-size:13px;font-weight:600;color:#333;margin-bottom:2px">高级催乳师</div><div style="font-size:11px;color:#999">42节课 · ¥980 · ▶免费试听</div></div>
-        </div>
-      </div>
+      <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:10px" id="myTitle">我的课程</div>
+      <div id="myCourses" style="display:flex;flex-direction:column;gap:12px"></div>
+      <div style="font-size:14px;font-weight:600;color:#333;margin:16px 0 10px" id="hotTitle">热门课程</div>
+      <div id="hotCourses" style="display:flex;flex-direction:column;gap:12px"></div>
     </div>
     <div class="tabbar">
       <div class="tab-item" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
       <div class="tab-item" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
       <div class="tab-item act" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
-      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>工资</span></div>
       <div class="tab-item" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
     </div>
   </div>
@@ -564,7 +574,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
           <div class="line"></div>
           <div class="s"><div class="dot pending">4</div><div class="lb">上户</div></div>
         </div>
-        <div class="ap-info"><span>🏠 鹭岛家政</span><span>📅 5月8日 14:00</span><span>📍 思明区</span></div>
+        <div class="ap-info"><span>📅 5月8日 14:00</span><span>📍 思明区</span></div>
         <div class="ap-countdown">⏰ 距面试还有 2天 4小时</div>
         <div class="ap-actions">
           <div class="ap-btn pr" onclick="event.stopPropagation();showToast('📞 正在联系客户...')">📞 联系客户</div>
@@ -573,7 +583,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
       </div>
       <div class="ap-c">
         <div class="ap-ch"><div class="ap-t">【白班保姆】日常保洁</div><span class="ap-st pd">⏳ 等待审核</span></div>
-        <div class="ap-info"><span>🏠 好阿姨平台</span><span>📅 今天 15:02 投递</span></div>
+        <div class="ap-info"><span>📅 今天 15:02 投递</span></div>
         <div class="ap-actions">
           <div class="ap-btn sc" onclick="showToast('📋 查看岗位详情')">📋 查看详情</div>
           <div class="ap-btn dg" onclick="showConfirm('⚠️','确认撤回','确定撤回该应聘申请？',()=>showToast('🔄 已撤回申请'))">撤回申请</div>
@@ -581,9 +591,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
       </div>
       <div class="ap-c">
         <div class="ap-ch"><div class="ap-t">【钟点工】两小时保洁</div><span class="ap-st ok">✅ 已通过</span></div>
-        <div class="ap-info"><span>🏠 鹭岛家政</span><span>📅 明天上岗</span></div>
+        <div class="ap-info"><span>📅 明天上岗</span></div>
         <div class="ap-actions">
-          <div class="ap-btn pr" onclick="showConfirm('✅','确认上岗','确认明天前往客户家开始服务？',()=>showToast('🎉 已确认上岗！'))">✅ 确认上岗</div>
+          <div class="ap-btn pr" onclick="showConfirm('✅','确认上岗','确认明天前往客户家开始服务？',()=>setStatus('working'))">✅ 确认上岗</div>
           <div class="ap-btn sc" onclick="showToast('📞 正在拨打客户电话...')">📞 联系客户</div>
         </div>
       </div>
@@ -592,7 +602,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
       <div class="tab-item" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
       <div class="tab-item act" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
       <div class="tab-item" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
-      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>工资</span></div>
       <div class="tab-item" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
     </div>
   </div>
@@ -706,64 +716,147 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
       <div class="tab-item" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
       <div class="tab-item" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
       <div class="tab-item" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
-      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>工资</span></div>
       <div class="tab-item" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
     </div>
   </div>
 
   <!-- ================================================
-       智能打卡
+       智能工资
        ================================================ -->
-  <div class="page" id="page-clock">
-    <div class="ck-hd">
-      <div class="ck-time" id="clockTime">09:41</div>
-      <div class="ck-date" id="clockDate">2026年5月6日 · 星期三</div>
-    </div>
-    <div class="ck-body">
-      <div class="ck-card">
-        <div class="ck-stat">
-          <div class="ck-si"><div class="ck-ic ci">☀️</div><div class="ck-sl">上班打卡</div><div class="ck-st">08:32</div></div>
-          <div class="ck-si"><div class="ck-ic co">🌙</div><div class="ck-sl">下班打卡</div><div class="ck-st">--:--</div></div>
+  <div class="page" id="page-clock" style="overflow:hidden">
+    <div style="flex:1;overflow-y:auto;background:#f5f5f5;padding:14px 16px 80px">
+      <!-- ===== 上户中内容 ===== -->
+      <div id="salaryContent">
+      <!-- 合同薪资规则 -->
+      <div style="background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+        <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="var s=document.getElementById('contractDetail').style;s.display=s.display==='none'?'block':'none'">
+          <div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">📋</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">合同薪资规则</span></div>
+          <span style="font-size:12px;color:#999">展开 ▼</span>
         </div>
-        <button class="ck-btn out" onclick="showConfirm('⏰','下班打卡','确认下班打卡？系统将自动记录工时',()=>showToast('✅ 下班打卡成功！今日工时 8.5h'))">⏰ 下班打卡<span class="sub">点击打卡</span></button>
-      </div>
-      <div class="leave-card">
-        <h4>📋 请假管理 <span onclick="showConfirm('📝','申请请假','请假需经理审批，确认提交？',()=>showToast('📤 请假申请已提交'))">➕ 申请请假</span></h4>
-        <div class="leave-stat">
-          <div class="leave-item"><div class="num" style="color:#f97316">2</div><div class="lb">可用事假(天)</div></div>
-          <div class="leave-item"><div class="num" style="color:#3b82f6">5</div><div class="lb">可用病假(天)</div></div>
-        </div>
-        <div style="margin-top:10px;padding:10px 12px;background:#fef3c7;border-radius:8px;font-size:12px;color:#d97706">⚠️ 请假需提前一天申请，等待经理审批</div>
-      </div>
-      <div class="cal-card">
-        <div class="cal-hd">
-          <div class="cal-nav"><button>‹</button><span class="cal-m">2026年5月</span><button>›</button></div>
-          <span style="font-size:11px;color:#999">出勤 13天</span>
-        </div>
-        <div class="cal-w"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
-        <div class="cal-d">
-          <span class="d om">27</span><span class="d om">28</span><span class="d om">29</span><span class="d om">30</span>
-          <span class="d hl">1</span><span class="d pr">2</span><span class="d pr">3</span>
-          <span class="d pr">4</span><span class="d pr">5</span><span class="d td">6</span><span class="d">7</span>
-          <span class="d pr">8</span><span class="d pr">9</span><span class="d pr">10</span><span class="d pr">11</span>
-          <span class="d pr">12</span><span class="d">13</span><span class="d pr">14</span><span class="d pr">15</span>
-          <span class="d pr">16</span><span class="d leave">17</span><span class="d">18</span><span class="d">19</span>
-          <span class="d">20</span><span class="d">21</span><span class="d">22</span><span class="d">23</span>
-          <span class="d">24</span><span class="d">25</span><span class="d">26</span><span class="d">27</span>
-          <span class="d">28</span><span class="d">29</span><span class="d">30</span><span class="d">31</span><span class="d om">1</span>
-        </div>
-        <div style="display:flex;gap:14px;margin-top:12px;font-size:11px;color:#999;flex-wrap:wrap">
-          <span>🟢 已出勤</span><span>🟡 请假</span><span>🔵 今天</span><span>🟠 节假日</span>
+        <div id="contractDetail" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0">
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+            <div style="display:flex;justify-content:space-between"><span style="color:#666">计薪方式</span><span style="color:#1a1a2e;font-weight:500">月薪制 · 5000元/月</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#666">工作天数</span><span style="color:#1a1a2e;font-weight:500">月休4天 · 应出勤26天</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#666">日薪折算</span><span style="color:#1a1a2e;font-weight:500">¥192.3/天</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#666">时薪折算</span><span style="color:#1a1a2e;font-weight:500">¥24.0/小时</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#666">节假日</span><span style="color:#d97706;font-weight:500">双倍工资</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#666">休息日加班</span><span style="color:#d97706;font-weight:500">1.5倍工资</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#666">事假扣款</span><span style="color:#ef4444;font-weight:500">日薪 × 请假天数</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#666">病假扣款</span><span style="color:#ef4444;font-weight:500">日薪 × 50%</span></div>
+          </div>
         </div>
       </div>
-      <div class="sal-card">
-        <div class="sal-ch"><h3>💰 本月工资预览</h3><span>实时更新</span></div>
-        <div class="sal-am">¥3,250.00</div>
-        <div class="sal-dt">截至5月6日 · 已出勤13天 · 时薪¥250</div>
-        <div class="sal-bd">
-          <div class="sal-bi"><div class="sal-bv">13天</div><div class="sal-bl">已出勤</div></div>
-          <div class="sal-bi"><div class="sal-bv">8.5h</div><div class="sal-bl">日均工时</div></div>
-          <div class="sal-bi"><div class="sal-bv">1天</div><div class="sal-bl">已请假</div></div>
+      <!-- 工资明细 -->
+      <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+        <div style="font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:12px">📊 本月工资明细</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+          <div style="display:flex;justify-content:space-between"><span style="color:#666">基本工资 13天 × ¥192.3</span><span style="color:#333;font-weight:500">¥2,500</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#666">节假日双倍 · 5月1日(劳动节)</span><span style="color:#d97706;font-weight:500">+¥192.3</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#666">休息日加班 · 5月4日(周日×1.5倍)</span><span style="color:#d97706;font-weight:500">+¥288.5</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#666">事假扣款 · 5月17日(1天)</span><span style="color:#ef4444;font-weight:500">-¥192.3</span></div>
+        </div>
+        <div style="border-top:1px dashed #e2e8f0;margin-top:10px;padding-top:10px;display:flex;justify-content:space-between">
+          <span style="font-size:14px;font-weight:600;color:#1a1a2e">预计税前</span>
+          <span style="font-size:18px;font-weight:700;color:#4f46e5">¥2,789</span>
+        </div>
+      </div>
+      <!-- 请假管理 -->
+      <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-size:14px;font-weight:600;color:#1a1a2e">📋 请假管理</div>
+          <span style="font-size:12px;color:#4f46e5;cursor:pointer;font-weight:500" onclick="showConfirm('📝','申请请假','请假需经理审批，确认提交？',()=>showToast('📤 请假申请已提交'))">➕ 申请请假</span>
+        </div>
+        <div style="display:flex;gap:16px">
+          <div><span style="font-size:11px;color:#999">可用事假</span><div style="font-size:18px;font-weight:700;color:#f97316">2<span style="font-size:12px;font-weight:400">天</span></div></div>
+          <div><span style="font-size:11px;color:#999">可用病假</span><div style="font-size:18px;font-weight:700;color:#3b82f6">5<span style="font-size:12px;font-weight:400">天</span></div></div>
+          <div><span style="font-size:11px;color:#999">本月已请</span><div style="font-size:18px;font-weight:700;color:#ef4444">1<span style="font-size:12px;font-weight:400">天</span></div></div>
+        </div>
+        <div style="margin-top:10px;padding:8px 10px;background:#fef2f2;border-radius:8px;font-size:11px;color:#dc2626;display:flex;align-items:center;gap:6px">
+          <span>📌</span> 事假扣日薪100% · 病假扣50% · 节假日请假按双倍扣
+        </div>
+      </div>
+      </div>
+      <!-- ===== 待岗中内容 ===== -->
+      <div id="standbyContent" style="display:none">
+        <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:14px;padding:16px;margin-bottom:12px;text-align:center">
+          <div style="font-size:36px;margin-bottom:6px">🏅</div>
+          <div style="font-size:15px;font-weight:700;color:#92400e;margin-bottom:4px">活跃阿姨标签</div>
+          <div style="font-size:12px;color:#b45309;line-height:1.6">连续打卡保持活跃状态<br>系统优先推荐你给招聘中的家政经理</div>
+          <div style="display:flex;justify-content:space-around;margin-top:12px;text-align:center">
+            <div><div style="font-size:13px;font-weight:700;color:#d97706">每日</div><div style="font-size:11px;color:#92400e">+1积分</div></div>
+            <div><div style="font-size:13px;font-weight:700;color:#d97706">活跃标签</div><div style="font-size:11px;color:#92400e">优先推荐</div></div>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+          <div style="font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:12px">📊 本月打卡统计</div>
+          <div style="display:flex;justify-content:space-around;text-align:center">
+            <div><div style="font-size:22px;font-weight:700;color:#4f46e5">5</div><div style="font-size:11px;color:#999">连续打卡</div></div>
+            <div><div style="font-size:22px;font-weight:700;color:#059669">8</div><div style="font-size:11px;color:#999">本月打卡</div></div>
+            <div><div style="font-size:22px;font-weight:700;color:#d97706">3</div><div style="font-size:11px;color:#999">岗位推荐</div></div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;background:#fff;border-radius:14px;border:1px solid #fde68a;font-size:12px;color:#92400e;line-height:1.6">
+          ⚠️ <strong>连续3天未打卡</strong>将取消活跃标签，岗位推荐降为普通优先级
+        </div>
+      </div>
+      <!-- ===== 打卡操作（共享） ===== -->
+      <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04);text-align:center">
+        <div id="clockDateTime">
+          <div style="font-size:24px;margin-bottom:4px;color:#1a1a2e;font-weight:600" id="clockTime">09:41</div>
+          <div style="font-size:12px;color:#999;margin-bottom:12px" id="clockDate">2026年5月9日 · 星期六</div>
+        </div>
+        <div id="clockBtns"></div>
+        <div id="clockTip" style="margin-top:8px;font-size:11px;color:#059669">今日已打卡 · 继续保持活跃 ✅</div>
+      </div>
+      <!-- ===== 打卡日历（共享） ===== -->
+      <div id="clockCalendar" style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span style="font-size:18px;cursor:pointer">‹</span>
+          <span style="font-size:14px;font-weight:600;color:#1a1a2e">2026年5月</span>
+          <span style="font-size:18px;cursor:pointer">›</span>
+          <span style="font-size:11px;color:#999">出勤13天</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;color:#999;margin-bottom:6px">
+          <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;gap:4px;font-size:12px">
+          <span style="padding:6px 0;color:#ccc">27</span><span style="padding:6px 0;color:#ccc">28</span><span style="padding:6px 0;color:#ccc">29</span><span style="padding:6px 0;color:#ccc">30</span>
+          <span style="padding:6px 0;background:#fef3c7;border-radius:6px;color:#d97706;font-weight:500">1<span style="display:block;font-size:8px">节</span></span>
+          <span style="padding:6px 0;background:#d1fae5;border-radius:6px;color:#059669">2</span>
+          <span style="padding:6px 0;background:#d1fae5;border-radius:6px;color:#059669">3</span>
+          <span style="padding:6px 0;background:#fef3c7;border-radius:6px;color:#d97706;font-weight:500">4<span style="display:block;font-size:8px">休</span></span>
+          <span style="padding:6px 0;background:#d1fae5;border-radius:6px;color:#059669">5</span>
+          <span style="padding:6px 0;background:#dbeafe;border-radius:6px;color:#4f46e5;font-weight:500">6</span>
+          <span style="padding:6px 0;color:#999">7</span>
+          <span style="padding:6px 0;background:#d1fae5;border-radius:6px;color:#059669">8</span>
+          <span style="padding:6px 0;background:#d1fae5;border-radius:6px;color:#059669">9</span>
+          <span style="padding:6px 0;background:#d1fae5;border-radius:6px;color:#059669">10</span>
+          <span style="padding:6px 0;background:#d1fae5;border-radius:6px;color:#059669">11</span>
+          <span style="padding:6px 0;background:#d1fae5;border-radius:6px;color:#059669">12</span>
+          <span style="padding:6px 0;color:#999">13</span>
+          <span style="padding:6px 0;background:#d1fae5;border-radius:6px;color:#059669">14</span>
+          <span style="padding:6px 0;background:#d1fae5;border-radius:6px;color:#059669">15</span>
+          <span style="padding:6px 0;background:#d1fae5;border-radius:6px;color:#059669">16</span>
+          <span style="padding:6px 0;background:#fef2f2;border-radius:6px;color:#ef4444">17<span style="display:block;font-size:8px">假</span></span>
+          <span style="padding:6px 0;color:#999">18</span>
+          <span style="padding:6px 0;color:#999">19</span>
+          <span style="padding:6px 0;color:#999">20</span>
+          <span style="padding:6px 0;color:#999">21</span>
+          <span style="padding:6px 0;color:#999">22</span>
+          <span style="padding:6px 0;color:#999">23</span>
+          <span style="padding:6px 0;color:#999">24</span>
+          <span style="padding:6px 0;color:#999">25</span>
+          <span style="padding:6px 0;color:#999">26</span>
+          <span style="padding:6px 0;color:#999">27</span>
+          <span style="padding:6px 0;color:#999">28</span>
+          <span style="padding:6px 0;color:#999">29</span>
+          <span style="padding:6px 0;color:#999">30</span>
+          <span style="padding:6px 0;color:#999">31</span>
+          <span style="padding:6px 0;color:#ccc">1</span>
+        </div>
+        <div style="display:flex;gap:14px;margin-top:12px;font-size:10px;color:#999;flex-wrap:wrap">
+          <span>🟢 出勤</span><span>🔴 请假</span><span>🟡 节假日</span><span>🔵 今天</span><span>🟠 休息日加班</span>
         </div>
       </div>
     </div>
@@ -771,7 +864,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
       <div class="tab-item" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
       <div class="tab-item" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
       <div class="tab-item" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
-      <div class="tab-item act" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item act" onclick="switchPage('clock')"><span class="tab-ic">💰</span><span>工资</span></div>
       <div class="tab-item" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
     </div>
   </div>
@@ -782,16 +875,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
 <div class="page" id="page-course-detail">
   <div class="course-body">
     <div class="course-bg" id="courseBg" style="background:linear-gradient(135deg,#1e40af,#3b82f6)">
-      <button class="back-btn" onclick="switchPage('ai')">‹</button>
+      <button class="back-btn" onclick="switchPage('study')">← 返回</button>
       <div class="ct" id="courseTitle">月嫂上户必备91项技能</div>
       <div class="cs" id="courseSub">共48节课 · 含实训视频</div>
     </div>
     <div class="course-ct">
       <h3 id="courseDetailTitle">月嫂上户必备91项技能</h3>
-      <div class="price">
+      <div class="price" id="priceRow">
         <span id="coursePrice">¥980</span>
         <span class="points" id="coursePoints">或 980积分兑换</span>
       </div>
+      <div id="certBadge" style="display:inline-block;padding:3px 10px;background:#dcfce7;color:#059669;border-radius:20px;font-size:11px;font-weight:500;margin-bottom:8px"></div>
       <div class="course-info-grid">
         <div class="course-info-item"><div class="num" id="ciLessons">48</div><div class="lb">总课时</div></div>
         <div class="course-info-item"><div class="num" id="ciDone">17</div><div class="lb">已完成</div></div>
@@ -867,10 +961,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
       </div>
     </div>
   </div>
-  <div class="course-actions">
-    <button class="try-free" onclick="showToast('▶ 正在播放第1节免费试听课...')">▶ 免费试听</button>
-    <button class="points-buy" onclick="showConfirm('📚','积分兑换','确认使用980积分兑换此课程？当前积分：350',()=>showToast('❌ 积分不足，还需630积分'))">🎯 积分兑换</button>
-    <button class="buy" onclick="showToast('🛒 正在跳转支付...')">立即购买 ¥980</button>
+  <div class="course-actions" id="courseActions">
+    <button class="try-free" id="btnTry">▶ 免费试听</button>
+    <button class="points-buy" id="btnPoints">🎯 积分兑换</button>
+    <button class="buy" id="btnBuy">立即购买 ¥980</button>
   </div>
 </div>
 
@@ -879,9 +973,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
      ================================================ -->
 <div class="page" id="page-points">
   <div style="background:#fff;padding:12px 20px;border-bottom:1px solid #f0f0f0;padding-top:calc(12px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:12px">
-    <span style="font-size:20px;cursor:pointer" onclick="switchPage('ai')">‹</span>
+    <span style="font-size:13px;cursor:pointer;color:#4f46e5;font-weight:500" onclick="switchPage('study')">← 返回自习室</span>
     <h2 style="font-size:18px;font-weight:600;color:#333;flex:1">积分明细</h2>
-    <span style="font-size:12px;color:#07c160;cursor:pointer" onclick="showToast('📋 积分规则：拉新+30分 · 每日打卡+5分 · 学习+10分')">规则</span>
+    <span style="font-size:12px;color:#07c160;cursor:pointer" onclick="showDetail('points_rules')">规则</span>
   </div>
   <div class="points-body">
     <div class="points-hd">
@@ -889,8 +983,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
       <div class="lb">当前积分</div>
       <div class="points-earn">
         <span>🎯 拉新阿姨 +30分</span>
-        <span>⏰ 每日打卡 +5分</span>
-        <span>📖 学习 +10分</span>
+        <span>⏰ 打卡单次 +1分</span>
+        <span>📚 学完课程 +30分</span>
+        <span>🏅 考过证书 +30分</span>
+        <span>📅 工作满月 +10分</span>
       </div>
     </div>
     <div class="pts-header">
@@ -902,6 +998,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
         <div class="pts-icon" style="background:#d1fae5">🎯</div>
         <div class="pts-info"><div class="tt">拉新阿姨入驻</div><div class="tm">今天 14:30 · 推荐王阿姨注册</div></div>
         <div class="pts-val plus">+30</div>
+      </div>
+      <div class="pts-item">
+        <div class="pts-icon" style="background:#dbeafe">🏅</div>
+        <div class="pts-info"><div class="tt">考过证书 · 高级育婴师证</div><div class="tm">04-30 15:20 · 证书审核通过</div></div>
+        <div class="pts-val plus">+30</div>
+      </div>
+      <div class="pts-item">
+        <div class="pts-icon" style="background:#fce7f3">📚</div>
+        <div class="pts-info"><div class="tt">学完课程 · 高级保洁师</div><div class="tm">04-29 18:00 · 完成全部24节课</div></div>
+        <div class="pts-val plus">+30</div>
+      </div>
+      <div class="pts-item">
+        <div class="pts-icon" style="background:#d1fae5">📅</div>
+        <div class="pts-info"><div class="tt">工作满月奖励</div><div class="tm">04-25 00:00 · 连续工作满1个月</div></div>
+        <div class="pts-val plus">+10</div>
       </div>
       <div class="pts-item">
         <div class="pts-icon" style="background:#dbeafe">⏰</div>
@@ -930,8 +1041,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
       </div>
       <div class="pts-item">
         <div class="pts-icon" style="background:#dbeafe">⏰</div>
-        <div class="pts-info"><div class="tt">每日打卡签到</div><div class="tm">04-28 07:55 · 连续打卡第3天</div></div>
-        <div class="pts-val plus">+5</div>
+        <div class="pts-info"><div class="tt">上班打卡</div><div class="tm">04-28 07:55 · 连续第3天</div></div>
+        <div class="pts-val plus">+1</div>
       </div>
       <div class="pts-item">
         <div class="pts-icon" style="background:#ede9fe">🎁</div>
@@ -963,8 +1074,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
     </div>
     <div style="font-size:12px;color:#999;margin-bottom:16px;padding:10px;background:#f5f5f5;border-radius:8px;text-align:left">
       分享推荐链接给阿姨 → 阿姨注册并完善简历 → <span style="color:#07c160;font-weight:500">您得 +30积分</span><br>
-      阿姨成功上户并工作满一个月 → <span style="color:#d97706;font-weight:500">您再得 ¥6红包</span><br>
-      <span style="color:#07c160;font-weight:500">每日打卡 +5分 · 推荐无限次</span>
+      阿姨成功上户并工作满一个月 → <span style="color:#d97706;font-weight:500">您再得 ¥6红包</span>
     </div>
     <div class="confirm-actions" style="flex-direction:column;gap:8px">
       <button class="confirm-ok" onclick="copyReferralLink()" style="width:100%">📤 分享推荐链接</button>
@@ -1050,7 +1160,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
       <div class="tab-item" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
       <div class="tab-item" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
       <div class="tab-item" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
-      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>工资</span></div>
       <div class="tab-item act" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
     </div>
   </div>
@@ -1090,7 +1200,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
       <div class="tab-item" onclick="switchPage('home')"><span class="tab-ic">🏠</span><span>首页</span></div>
       <div class="tab-item" onclick="switchPage('apply')"><span class="tab-ic">📋</span><span>应聘</span></div>
       <div class="tab-item" onclick="switchPage('study')"><span class="tab-ic" style="font-size:22px">📚</span><span>自习室</span></div>
-      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>打卡</span></div>
+      <div class="tab-item" onclick="switchPage('clock')"><span class="tab-ic">⏰</span><span>工资</span></div>
       <div class="tab-item act" onclick="switchPage('profile')"><span class="tab-ic">👤</span><span>我的</span></div>
     </div>
   </div>
@@ -1121,14 +1231,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
         <h4>📝 工作要求</h4>
         <div class="detail-desc" id="jdDesc"></div>
       </div>
-      <div class="detail-section">
-        <h4>🏢 公司信息</h4>
-        <div class="detail-desc" id="jdComp"></div>
-      </div>
     </div>
     <div class="detail-footer">
-      <button class="btn-secondary" onclick="showToast('📞 联系客户...')">📞 联系客户</button>
-      <button class="btn-primary" onclick="showConfirm('✅','确认应聘','确认应聘该岗位？简历将发送给客户',()=>{closeJob();showToast('✅ 应聘成功！等待审核')})">立即应聘</button>
+      <button class="btn-secondary" onclick="showToast('📞 正在联系您的家政经理...')">📞 联系我的经理</button>
+      <button class="btn-primary" onclick="showConfirm('✅','确认应聘','确认应聘该岗位？',()=>{closeJob();showToast('✅ 应聘成功！等待审核')})">立即应聘</button>
     </div>
   </div>
 
@@ -1164,6 +1270,22 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
     </div>
   </div>
 
+  <!-- ===== 支付确认弹窗 ===== -->
+  <div class="status-overlay" id="payOverlay">
+    <div class="status-sheet" style="padding:0 20px 20px">
+      <div class="status-handle"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="font-size:17px;font-weight:600;color:#1a1a2e">确认支付</h3>
+        <span style="font-size:18px;color:#999;cursor:pointer" onclick="closePay()">✕</span>
+      </div>
+      <div id="payContent" style="max-height:55vh;overflow-y:auto"></div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button style="flex:1;padding:14px;border-radius:12px;border:1px solid #e2e8f0;background:#fff;color:#666;font-size:15px;font-weight:500;cursor:pointer" onclick="closePay()">取消</button>
+        <button style="flex:1;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#07c160,#10b980);color:#fff;font-size:15px;font-weight:600;cursor:pointer" onclick="doPay()">确认支付</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== 确认弹窗 ===== -->
   <div class="confirm-overlay" id="confirmOverlay">
     <div class="confirm-box">
@@ -1188,8 +1310,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
       <div id="detailContent" style="max-height:60vh;overflow-y:auto"></div>
     </div>
   </div>
+</div>
 
-  <!-- ===== 状态切换弹窗 ===== -->
+  <!-- ===== 状态切换弹窗(移出#app避免overflow:hidden拦截) ===== -->
   <div class="status-overlay" id="statusOverlay">
     <div class="status-sheet">
       <div class="status-handle"></div>
@@ -1225,9 +1348,55 @@ html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5;font-family:
     </div>
   </div>
 
-</div>
-
 <script>
+// ===== 自习室课程渲染 =====
+function renderCourses(){
+  var myHtml = '', hotHtml = '';
+  COURSE_DATA.forEach(function(c, i){
+    var card;
+    if(c.paid){
+      // 已付费课程卡片
+      var progressHtml = '<div style="display:flex;align-items:center;gap:6px;margin-top:6px">' +
+        '<div style="flex:1;height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden">' +
+          '<div style="width:'+c.progress+'%;height:100%;background:linear-gradient(90deg,#f59e0b,#d97706);border-radius:2px"></div>' +
+        '</div>' +
+        '<span style="font-size:10px;color:#d97706;font-weight:500;white-space:nowrap">'+c.progress+'%</span>' +
+      '</div>';
+      var badgeHtml = '';
+      if(c.certified) badgeHtml = '<span style="padding:2px 6px;background:#dcfce7;color:#059669;border-radius:4px;font-size:10px;font-weight:500">✅ 已考证</span>';
+      else if(c.progress >= 100) badgeHtml = '<span style="padding:2px 6px;background:#fef3c7;color:#d97706;border-radius:4px;font-size:10px;font-weight:500">📜 可考证</span>';
+      var subHtml = c.certified ? '已完成 · 已获证' : (c.progress >= 100 ? '已完成 · 待考证' : '学习中');
+      card = '<div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer" onclick="showCourseDetail('+i+')">' +
+        '<div style="height:80px;background:'+c.bg+';display:flex;align-items:center;justify-content:center;font-size:30px;position:relative">' +
+          c.icon +
+          '<div style="position:absolute;top:8px;right:8px">'+badgeHtml+'</div>' +
+        '</div>' +
+        '<div style="padding:8px 14px 10px">' +
+          '<div style="font-size:13px;font-weight:600;color:#333;margin-bottom:2px">'+c.name+'</div>' +
+          '<div style="font-size:10px;color:#999">'+subHtml+' · '+c.totalLessons+'节课</div>' +
+          progressHtml +
+        '</div>' +
+      '</div>';
+      myHtml += card;
+    } else {
+      // 未付费课程卡片
+      card = '<div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer" onclick="showCourseDetail('+i+')">' +
+        '<div style="height:80px;background:'+c.bg+';display:flex;align-items:center;justify-content:center;font-size:30px">'+c.icon+'</div>' +
+        '<div style="padding:8px 14px 10px">' +
+          '<div style="font-size:13px;font-weight:600;color:#333;margin-bottom:2px">'+c.name+'</div>' +
+          '<div style="font-size:10px;color:#999">'+c.totalLessons+'节课 · '+c.price+' · ▶免费试听</div>' +
+        '</div>' +
+      '</div>';
+      hotHtml += card;
+    }
+  });
+  document.getElementById('myCourses').innerHTML = myHtml;
+  document.getElementById('hotCourses').innerHTML = hotHtml;
+  document.getElementById('myTitle').style.display = myHtml ? '' : 'none';
+  document.getElementById('hotTitle').style.display = hotHtml ? '' : 'none';
+}
+// renderCourses 移到 COURSE_DATA 定义之后调用
+
 // ===== 页面路由 =====
 const pages = ['home','apply','ai','study','clock','profile','msg','course-detail','points'];
 function switchPage(id) {
@@ -1250,6 +1419,7 @@ function switchPage(id) {
     if(dp) t.classList.toggle('act', dp===id);
   });
   window.scrollTo(0,0);
+  if(id==='clock') updateClockView();
 }
 
 // ===== Toast =====
@@ -1326,9 +1496,9 @@ function doConfirm() {
 
 // ===== 岗位详情 =====
 const jobs = [
-  {title:'【住家保姆】三室一厅 照顾1岁宝宝',salary:'¥6,000/月',type:'住家保姆',area:'五缘湾',time:'做六休一',req:'有育婴师证',interview:'现场面试',desc:'照顾1岁宝宝，负责宝宝饮食起居、早教互动；日常家庭保洁、三餐制作。要求有带娃经验，有耐心，身体健康。',comp:'厦门鹭岛家政服务有限公司 · 成立8年 · 服务家庭超2000户'},
-  {title:'【白班保姆】四室两厅 日常保洁',salary:'¥4,500/月',type:'白班保姆',area:'思明区',time:'08:00-17:00',req:'有健康证',interview:'视频面试',desc:'日常家庭保洁、衣物整理、三餐制作。客户为两口之家，200平米大平层。要求细心负责，会做闽南菜优先。',comp:'好阿姨平台 · O2O家政服务平台'},
-  {title:'【钟点工】每天2小时 买菜做饭',salary:'¥2,800/月',type:'钟点工',area:'思明区',time:'16:00-18:00',req:'擅长做饭',interview:'电话面试',desc:'每天下午去客户家买菜做饭，2菜1汤标准。客户是两位退休老人，口味偏清淡。要求会做家常菜，干净卫生。',comp:'熊猫家政 · 厦门本地家政品牌'}
+  {title:'【住家保姆】三室一厅 照顾1岁宝宝',salary:'¥6,000/月',type:'住家保姆',area:'五缘湾',time:'做六休一',req:'有育婴师证',interview:'现场面试',desc:'照顾1岁宝宝，负责宝宝饮食起居、早教互动；日常家庭保洁、三餐制作。要求有带娃经验，有耐心，身体健康。'},
+  {title:'【白班保姆】四室两厅 日常保洁',salary:'¥4,500/月',type:'白班保姆',area:'思明区',time:'08:00-17:00',req:'有健康证',interview:'视频面试',desc:'日常家庭保洁、衣物整理、三餐制作。客户为两口之家，200平米大平层。要求细心负责，会做闽南菜优先。'},
+  {title:'【钟点工】每天2小时 买菜做饭',salary:'¥2,800/月',type:'钟点工',area:'思明区',time:'16:00-18:00',req:'擅长做饭',interview:'电话面试',desc:'每天下午去客户家买菜做饭，2菜1汤标准。客户是两位退休老人，口味偏清淡。要求会做家常菜，干净卫生。'}
 ];
 function showJobDetail(idx) {
   const j = jobs[idx];
@@ -1341,7 +1511,6 @@ function showJobDetail(idx) {
   document.getElementById('jdReq').textContent = j.req;
   document.getElementById('jdInt').textContent = j.interview;
   document.getElementById('jdDesc').textContent = j.desc;
-  document.getElementById('jdComp').textContent = j.comp;
   document.getElementById('jobOverlay').classList.add('show');
   document.getElementById('jobSheet').style.display = 'block';
 }
@@ -1432,65 +1601,82 @@ const statusMap = {
   quit: { dot: '#6b7280', home: '当前状态：已转行', profile: '已转行 — 不再接单', check: 'check-quit' }
 };
 
-// 初始化同步状态
-setStatus('available');
+// 状态已在HTML中预设，无需初始化
+
 
 function showStatusModal() {
-  document.getElementById('statusOverlay').classList.add('show');
+  document.getElementById('statusOverlay').style.display = 'flex';
 }
 function closeStatusModal() {
-  document.getElementById('statusOverlay').classList.remove('show');
+  document.getElementById('statusOverlay').style.display = 'none';
 }
 function setStatus(status) {
-  const s = statusMap[status];
+  var s = statusMap[status];
   if (!s) return;
-
-  // Update UI elements
-  document.getElementById('homeStatusDot').style.background = s.dot;
-  document.getElementById('homeStatusText').textContent = s.home;
-  document.getElementById('profileStatusDot').style.background = s.dot;
-  document.getElementById('profileStatusText').textContent = s.profile;
-
-  // Update modal option states
-  document.querySelectorAll('.status-opt').forEach(opt => {
-    opt.classList.remove('active');
-    opt.classList.add('inactive');
-  });
-  document.querySelector(`[data-status="${status}"]`).classList.add('active');
-  document.querySelector(`[data-status="${status}"]`).classList.remove('inactive');
-
-  document.querySelectorAll('.status-opt-check').forEach(el => el.style.display = 'none');
-  document.getElementById(s.check).style.display = 'inline';
-
   currentStatus = status;
-
-  // Update home header background based on status
-  const hd = document.querySelector('#page-home .home-hd');
-  if (status === 'available') {
-    hd.style.background = 'linear-gradient(135deg,#07c160,#10b980)';
-    document.getElementById('statusTip').style.display = 'flex';
-    document.getElementById('jobList').style.display = 'block';
-    document.getElementById('statusPlaceholder').style.display = 'none';
-  } else if (status === 'working') {
-    hd.style.background = 'linear-gradient(135deg,#3b82f6,#2563eb)';
-    document.getElementById('statusTip').style.display = 'none';
-    document.getElementById('jobList').style.display = 'none';
-    document.getElementById('statusPlaceholder').style.display = 'block';
-    document.getElementById('statusIcon').textContent = '🔵';
-    document.getElementById('statusTitle').textContent = '您当前正在上户中';
-    document.getElementById('statusDesc').textContent = '您已有关联雇主，暂不推荐新岗位。如需查看历史岗位，请切换工作状态。';
-  } else {
-    hd.style.background = 'linear-gradient(135deg,#6b7280,#4b5563)';
-    document.getElementById('statusTip').style.display = 'none';
-    document.getElementById('jobList').style.display = 'none';
-    document.getElementById('statusPlaceholder').style.display = 'block';
-    document.getElementById('statusIcon').textContent = '⚫';
-    document.getElementById('statusTitle').textContent = '您已修改为「已转行」';
-    document.getElementById('statusDesc').textContent = '您已选择不再从事家政行业，岗位推荐已暂停。如需重新接单，请更新工作状态为「待岗中」。';
+  // 安全更新UI
+  var hd = document.getElementById('homeStatusDot'); if(hd) hd.style.background = s.dot;
+  var ht = document.getElementById('homeStatusText'); if(ht) ht.textContent = s.home;
+  var pd = document.getElementById('profileStatusDot'); if(pd) pd.style.background = s.dot;
+  var pt = document.getElementById('profileStatusText'); if(pt) pt.textContent = s.profile;
+  // 更新模态框
+  try {
+    var opts = document.querySelectorAll('.status-opt');
+    opts.forEach(function(o){ o.classList.remove('active'); o.classList.add('inactive'); });
+    var sel = document.querySelector('[data-status="'+status+'"]');
+    if(sel){ sel.classList.add('active'); sel.classList.remove('inactive'); }
+    var checks = document.querySelectorAll('.status-opt-check');
+    checks.forEach(function(c){ c.style.display = 'none'; });
+    var chk = document.getElementById(s.check);
+    if(chk) chk.style.display = 'inline';
+  } catch(e){}
+  // 更新首页背景
+  var homeHd = document.querySelector('#page-home .home-hd');
+  if(homeHd){
+    if(status==='available') homeHd.style.background = 'linear-gradient(135deg,#07c160,#10b980)';
+    else if(status==='working') homeHd.style.background = 'linear-gradient(135deg,#3b82f6,#2563eb)';
+    else homeHd.style.background = 'linear-gradient(135deg,#6b7280,#4b5563)';
   }
-
-  showToast('✅ 状态已更新为' + statusMap[status].home.replace('当前状态：',''));
+  // 更新首页内容
+  var st = document.getElementById('statusTip'); var jl = document.getElementById('jobList'); var sp = document.getElementById('statusPlaceholder');
+  if(st) st.style.display = status==='available' ? 'flex' : 'none';
+  if(jl) jl.style.display = status==='available' ? 'block' : 'none';
+  if(sp){
+    sp.style.display = status==='available' ? 'none' : 'block';
+    var si = document.getElementById('statusIcon'); var stt = document.getElementById('statusTitle'); var sd = document.getElementById('statusDesc');
+    if(status==='working'){ if(si) si.textContent='🔵'; if(stt) stt.textContent='您当前正在上户中'; if(sd) sd.textContent='您已有关联雇主，暂不推荐新岗位。'; }
+    else { if(si) si.textContent='⚫'; if(stt) stt.textContent='您已修改为「已转行」'; if(sd) sd.textContent='您已选择不再从事家政行业。'; }
+  }
+  showToast('✅ 状态已更新为' + s.home.replace('当前状态：',''));
   closeStatusModal();
+  updateClockView();
+}
+function updateClockView(){
+  try {
+    var sc = document.getElementById('salaryContent');
+    var bc = document.getElementById('standbyContent');
+    if(!sc || !bc) return;
+    var isWorking = currentStatus === 'working';
+    sc.style.display = isWorking ? '' : 'none';
+    bc.style.display = isWorking ? 'none' : '';
+    var tip = document.getElementById('clockTip');
+    if(tip) tip.textContent = isWorking ? '今日：正常工作日' : '今日已打卡 · 继续保持活跃 ✅';
+    // 时间显隐
+    var cdt = document.getElementById('clockDateTime');
+    if(cdt) cdt.style.display = isWorking ? '' : 'none';
+    // 日历显隐
+    var cal = document.getElementById('clockCalendar');
+    if(cal) cal.style.display = isWorking ? '' : 'none';
+    // 切换打卡按钮
+    var btns = document.getElementById('clockBtns');
+    if(btns){
+      if(isWorking){
+        btns.innerHTML = '<div style="display:flex;gap:12px"><button style="flex:1;padding:14px;border-radius:12px;border:none;background:#eef2ff;color:#4f46e5;font-size:15px;font-weight:600;cursor:pointer" onclick="showToast(\'✅ 上班打卡成功 · 08:32\')">☀️ 上班打卡</button><button style="flex:1;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;font-size:15px;font-weight:600;cursor:pointer" onclick="showConfirm(\'🌙\',\'下班打卡\',\'确认下班打卡？\',()=>showToast(\'✅ 下班打卡成功！\'))">🌙 下班打卡</button></div>';
+      } else {
+        btns.innerHTML = '<div class="standby-btn-wrap"><button class="standby-btn" onclick="showToast(\'✅ 打卡成功 +1积分\')"><span class="emoji">✅</span><span class="label">待岗打卡</span></button></div>';
+      }
+    }
+  } catch(e){}
 }
 
 // ===== 详情面板 =====
@@ -1500,10 +1686,11 @@ var DETAIL_CONTENT = {
   history: '<div style="display:flex;flex-direction:column;gap:10px"><div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:500;color:#1a1a2e">育儿嫂 · 带1岁宝宝</span><span style="font-size:11px;color:#059669">已完成</span></div><div style="font-size:11px;color:#999;margin:4px 0">2026年3月 - 4月 · 白班 · 武侯区</div><div style="font-size:12px;color:#d97706;font-weight:500">¥5,500/月</div></div><div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:500;color:#1a1a2e">月嫂 · 26天住家</span><span style="font-size:11px;color:#059669">已完成</span></div><div style="font-size:11px;color:#999;margin:4px 0">2025年12月 · 住家 · 锦江区</div><div style="font-size:12px;color:#d97706;font-weight:500">¥8,800/26天</div></div><div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:500;color:#1a1a2e">育儿嫂 · 带6个月双胞胎</span><span style="font-size:11px;color:#059669">已完成</span></div><div style="font-size:11px;color:#999;margin:4px 0">2025年8月 - 10月 · 住家 · 武侯区</div><div style="font-size:12px;color:#d97706;font-weight:500">¥7,000/月</div></div></div>',
   salary: '<div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;color:#666">本月收入</span><span style="font-size:20px;font-weight:700;color:#d97706">¥3,250</span></div><div style="height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden"><div style="width:65%;height:100%;background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div><div style="font-size:10px;color:#999;margin-top:4px">预计本月 ¥5,000 · 已完成65%</div></div><div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:12"><div style="font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:8px">📅 最近收入</div><div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>4月 · 育儿嫂</span><span style="color:#d97706">¥5,500</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span>3月 · 育儿嫂</span><span style="color:#d97706">¥5,500</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span>2月 · 休整</span><span style="color:#999">—</span></div></div></div>',
   reviews: '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><div style="font-size:32px;font-weight:700;color:#d97706">4.9</div><div><div style="font-size:12px;color:#666">⭐⭐⭐⭐⭐</div><div style="font-size:11px;color:#999">共 48 条评价</div></div></div><div style="display:flex;flex-direction:column;gap:10px"><div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:13px;font-weight:500;color:#1a1a2e">张女士</span><span style="font-size:11px;color:#d97706">⭐⭐⭐⭐⭐</span></div><div style="font-size:12px;color:#666;line-height:1.6">阿姨非常细心，带宝宝特别有耐心，我出差期间完全放心。强烈推荐！</div><div style="font-size:10px;color:#bbb;margin-top:4px">2026年4月 · 育儿嫂</div></div><div style="background:#f8fafc;border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:13px;font-weight:500;color:#1a1a2e">李女士</span><span style="font-size:11px;color:#d97706">⭐⭐⭐⭐⭐</span></div><div style="font-size:12px;color:#666;line-height:1.6">月嫂经验丰富，月子餐做得好，晚上也会帮忙带宝宝让我休息好。</div><div style="font-size:10px;color:#bbb;margin-top:4px">2025年12月 · 月嫂</div></div></div>',
-  settings: '<div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="showToast(\'隐私设置\')"><span style="font-size:14px;color:#333">🔒 隐私设置</span><span style="font-size:12px;color:#999">谁可以看到我的简历 ›</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="showToast(\'消息通知\')"><span style="font-size:14px;color:#333">🔔 消息通知</span><span style="font-size:12px;color:#999">推送、短信、电话 ›</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="showToast(\'账号安全\')"><span style="font-size:14px;color:#333">🛡️ 账号安全</span><span style="font-size:12px;color:#999">修改密码 · 注销账户 ›</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="showToast(\'关于熊猫家政\')"><span style="font-size:14px;color:#333">ℹ️ 关于</span><span style="font-size:12px;color:#999">版本 1.0.0 ›</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;cursor:pointer" onclick="showConfirm(\'⚠️\',\'退出登录\',\'确认退出当前账号？\',()=>showToast(\'已退出登录\'))"><span style="font-size:14px;color:#ef4444">退出登录</span><span style="font-size:12px;color:#999">›</span></div></div>'
+  settings: '<div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="showToast(\'隐私设置\')"><span style="font-size:14px;color:#333">🔒 隐私设置</span><span style="font-size:12px;color:#999">谁可以看到我的简历 ›</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="showToast(\'消息通知\')"><span style="font-size:14px;color:#333">🔔 消息通知</span><span style="font-size:12px;color:#999">推送、短信、电话 ›</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="showToast(\'账号安全\')"><span style="font-size:14px;color:#333">🛡️ 账号安全</span><span style="font-size:12px;color:#999">修改密码 · 注销账户 ›</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="showToast(\'关于熊猫家政\')"><span style="font-size:14px;color:#333">ℹ️ 关于</span><span style="font-size:12px;color:#999">版本 1.0.0 ›</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;cursor:pointer" onclick="showConfirm(\'⚠️\',\'退出登录\',\'确认退出当前账号？\',()=>showToast(\'已退出登录\'))"><span style="font-size:14px;color:#ef4444">退出登录</span><span style="font-size:12px;color:#999">›</span></div></div>',
+  points_rules: '<div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:12px">积分获取规则</div><div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#333">🎯 拉新阿姨入驻</span><span style="font-size:14px;font-weight:600;color:#07c160">+30</span></div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#333">⏰ 上班打卡</span><span style="font-size:14px;font-weight:600;color:#07c160">+1</span></div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#333">⏰ 下班打卡</span><span style="font-size:14px;font-weight:600;color:#07c160">+1</span></div><div style="font-size:11px;color:#999;margin:-4px 0 2px 24px">每日打卡上限 2 分</div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#333">📚 学完一门课程</span><span style="font-size:14px;font-weight:600;color:#07c160">+30</span></div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#333">🏅 考过一门证书</span><span style="font-size:14px;font-weight:600;color:#07c160">+30</span></div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#333">📅 工作满1个月</span><span style="font-size:14px;font-weight:600;color:#07c160">+10</span></div></div></div><div style="background:#fef3c7;border-radius:12px;padding:14px;font-size:12px;color:#92400e;line-height:1.8">💡 <strong>积分用途：</strong>可兑换自习室课程（1积分=¥1），也可在支付时选积分抵扣。</div>'
 };
 function showDetail(type){
-  var titles = {resume:'📄 我的简历',resume_ok:'📄 简历审核',history:'📅 工作记录',salary:'💰 工资明细',reviews:'⭐ 客户评价',settings:'⚙️ 设置'};
+  var titles = {resume:'📄 我的简历',resume_ok:'📄 简历审核',history:'📅 工作记录',salary:'💰 工资明细',reviews:'⭐ 客户评价',settings:'⚙️ 设置',points_rules:'📋 积分规则'};
   document.getElementById('detailTitle').textContent = titles[type] || '详情';
   document.getElementById('detailContent').innerHTML = DETAIL_CONTENT[type] || '';
   document.getElementById('detailOverlay').classList.add('show');
@@ -1524,7 +1711,10 @@ var COURSE_DATA = [
     totalHours: '36h',
     hasCert: true,
     progress: 35,
+    paid: true,
+    certified: false,
     bg: 'linear-gradient(135deg,#1e40af,#3b82f6)',
+    icon: '📖',
     sections: [
       { title: '第一章：月嫂职业素养', sub: '职业礼仪 · 职业道德 · 法律法规', lessons: 3, status: 'done', free: true },
       { title: '第二章：产妇护理基础', sub: '产后恢复 · 伤口护理 · 营养餐', lessons: 5, status: 'done', free: false },
@@ -1541,17 +1731,20 @@ var COURSE_DATA = [
     price: '¥980',
     points: '980积分兑换',
     totalLessons: 36,
-    doneLessons: 0,
+    doneLessons: 36,
     totalHours: '28h',
     hasCert: true,
-    progress: 0,
+    progress: 100,
+    paid: true,
+    certified: true,
     bg: 'linear-gradient(135deg,#9333ea,#7c3aed)',
+    icon: '👶',
     sections: [
-      { title: '第一章：婴幼儿发展心理学', sub: '认知发展 · 情感发展 · 敏感期', lessons: 4, status: 'locked', free: true },
-      { title: '第二章：辅食添加与营养', sub: '分阶段辅食 · 过敏预防 · 食谱', lessons: 5, status: 'locked', free: false },
-      { title: '第三章：早期教育方法', sub: '感统训练 · 语言启蒙 · 音乐律动', lessons: 6, status: 'locked', free: false },
-      { title: '第四章：安全与急救', sub: '家庭安全 · 意外处理 · 海姆立克', lessons: 4, status: 'locked', free: false },
-      { title: '第五章：实操考核', sub: '技能操作 · 笔试 · 证书报考', lessons: 5, status: 'locked', free: false }
+      { title: '第一章：婴幼儿发展心理学', sub: '认知发展 · 情感发展 · 敏感期', lessons: 4, status: 'done', free: true },
+      { title: '第二章：辅食添加与营养', sub: '分阶段辅食 · 过敏预防 · 食谱', lessons: 5, status: 'done', free: false },
+      { title: '第三章：早期教育方法', sub: '感统训练 · 语言启蒙 · 音乐律动', lessons: 6, status: 'done', free: false },
+      { title: '第四章：安全与急救', sub: '家庭安全 · 意外处理 · 海姆立克', lessons: 4, status: 'done', free: false },
+      { title: '第五章：实操考核', sub: '技能操作 · 笔试 · 证书报考', lessons: 5, status: 'done', free: false }
     ]
   },
   {
@@ -1564,7 +1757,10 @@ var COURSE_DATA = [
     totalHours: '32h',
     hasCert: true,
     progress: 0,
+    paid: false,
+    certified: false,
     bg: 'linear-gradient(135deg,#059669,#10b981)',
+    icon: '🍼',
     sections: [
       { title: '第一章：乳房解剖与生理', sub: '乳房结构 · 泌乳原理 · 常见问题', lessons: 5, status: 'locked', free: true },
       { title: '第二章：催乳手法基础', sub: '按摩手法 · 穴位识别 · 实操练习', lessons: 6, status: 'locked', free: false },
@@ -1573,13 +1769,39 @@ var COURSE_DATA = [
       { title: '第五章：回奶与断奶', sub: '自然回奶 · 渐进断奶 · 注意事项', lessons: 4, status: 'locked', free: false },
       { title: '第六章：实操考核与证书', sub: '手法考核 · 理论考核 · 证书报考', lessons: 4, status: 'locked', free: false }
     ]
+  },
+  {
+    name: '高级保洁师',
+    subtitle: '共24节课 · 含实操视频',
+    price: '¥680',
+    points: '680积分兑换',
+    totalLessons: 24,
+    doneLessons: 24,
+    totalHours: '18h',
+    hasCert: true,
+    progress: 100,
+    paid: true,
+    certified: false,
+    bg: 'linear-gradient(135deg,#0891b2,#06b6d4)',
+    icon: '🧹',
+    sections: [
+      { title: '第一章：保洁工具与药剂', sub: '工具分类 · 药剂选择 · 安全使用', lessons: 4, status: 'done', free: true },
+      { title: '第二章：日常保洁流程', sub: '标准流程 · 分区保洁 · 时间管理', lessons: 5, status: 'done', free: false },
+      { title: '第三章：深度保洁技巧', sub: '厨房重油污 · 卫浴除霉 · 地毯清洗', lessons: 5, status: 'done', free: false },
+      { title: '第四章：客户沟通与服务', sub: '服务规范 · 投诉处理 · 客户维护', lessons: 3, status: 'done', free: false },
+      { title: '第五章：实操考核', sub: '技能考核 · 笔试 · 证书报考', lessons: 3, status: 'done', free: false }
+    ]
   }
 ];
+
+renderCourses();
+updateClockView();
 
 // ===== 课程详情函数 =====
 function showCourseDetail(idx) {
   if(idx < 0 || idx >= COURSE_DATA.length) return;
   var c = COURSE_DATA[idx];
+  _currentCourseData = c;
   // 填充数据
   document.getElementById('courseTitle').textContent = c.name;
   document.getElementById('courseSub').textContent = c.subtitle;
@@ -1593,6 +1815,34 @@ function showCourseDetail(idx) {
   document.getElementById('ciCert').textContent = c.hasCert ? '✓' : '—';
   document.getElementById('coursePct').textContent = c.progress + '%';
   document.getElementById('courseProgressBar').style.width = c.progress + '%';
+  // 已付费隐藏价格
+  var priceRow = document.getElementById('priceRow');
+  if(priceRow) priceRow.style.display = c.paid ? 'none' : '';
+  // 认证状态徽章
+  var certBadge = document.getElementById('certBadge');
+  if(certBadge){
+    if(c.certified){ certBadge.style.display = ''; certBadge.innerHTML = '🏅 已获认证 · '+c.name+'证'; }
+    else if(c.progress >= 100){ certBadge.style.display = ''; certBadge.innerHTML = '📜 可考证'; }
+    else { certBadge.style.display = 'none'; }
+  }
+  // 底部按钮
+  var btnTry = document.getElementById('btnTry');
+  var btnPoints = document.getElementById('btnPoints');
+  var btnBuy = document.getElementById('btnBuy');
+  var actions = document.getElementById('courseActions');
+  if(c.paid){
+    if(c.certified){
+      actions.innerHTML = '<button style="flex:1;padding:14px;border-radius:12px;border:none;font-size:15px;cursor:default;background:#dcfce7;color:#059669;font-weight:600">✅ 课程已完成 · 已获认证</button>';
+    } else if(c.progress >= 100){
+      actions.innerHTML = '<button class="buy" style="flex:1" onclick="showToast(\'📜 证书报考已提交，等待审核\')">📜 立即考证</button>';
+    } else {
+      actions.innerHTML = '<button class="buy" style="flex:1" onclick="showToast(\'▶ 继续学习第'+(c.doneLessons+1)+'节...\')">▶ 继续学习</button>';
+    }
+  } else {
+    actions.innerHTML = '<button class="try-free" onclick="showToast(\'▶ 正在播放第1节免费试听课...\')">▶ 免费试听</button>' +
+      '<button class="points-buy" onclick="showConfirm(\'📚\',\'积分兑换\',\'确认使用'+c.points.replace('积分兑换','')+'兑换此课程？当前积分：350\',()=>showToast(\'❌ 积分不足\'))">🎯 积分兑换</button>' +
+      '<button class="buy" onclick="showPay()">立即购买 '+c.price+'</button>';
+  }
   // 渲染目录
   var listHtml = '';
   c.sections.forEach(function(s, i){
@@ -1600,9 +1850,10 @@ function showCourseDetail(idx) {
     var idxContent = '';
     if(s.status === 'done') { idxClass = 'done'; idxContent = '✓'; }
     else if(s.status === 'current') { idxClass = 'cur'; idxContent = (i+1); }
-    else { idxContent = (i+1); }
+    else { idxClass = 'locked'; idxContent = (i+1); }
     var freeTag = s.free ? '<span class="status-tag free">免费</span>' : '';
-    listHtml += '<div class="sec-item">' +
+    var lockClass = s.status === 'locked' ? ' locked' : '';
+    listHtml += '<div class="sec-item'+lockClass+'">' +
       '<div class="idx ' + idxClass + '">' + idxContent + '</div>' +
       '<div class="info"><div class="tt">' + s.title + '</div><div class="sub">' + s.sub + '</div></div>' +
       '<div class="dur">' + s.lessons + '节</div>' +
@@ -1663,6 +1914,65 @@ function sendAiMsg(){
 }
 function previewResume(){
   showToast('📋 简历预览即将上线，敬请期待');
+}
+// ===== 支付弹窗 =====
+var _payCoursePrice = 980;
+var _payPoints = 350;
+function showPay(){
+  var c = _currentCourseData || {name:'月嫂上户必备91项技能',price:'¥980'};
+  _payCoursePrice = parseInt(String(c.price).replace(/[^0-9]/g,'')) || 980;
+  _payPoints = 350;
+  updatePayUI(false, c.name);
+  document.getElementById('payOverlay').classList.add('show');
+}
+function closePay(){
+  document.getElementById('payOverlay').classList.remove('show');
+}
+function updatePayUI(usePoints, courseName){
+  courseName = courseName || document.getElementById('payCourseName').textContent;
+  var discount = usePoints ? _payPoints : 0;
+  var finalPrice = _payCoursePrice - discount;
+  document.getElementById('payContent').innerHTML =
+    '<div style="text-align:center;margin-bottom:16px">' +
+      '<div style="font-size:15px;font-weight:600;color:#1a1a2e;margin-bottom:4px" id="payCourseName">'+courseName+'</div>' +
+      '<div style="font-size:12px;color:#999">48节课 · 含实训视频 · 考证班</div>' +
+    '</div>' +
+    '<div style="background:#f8fafc;border-radius:12px;padding:14px;margin-bottom:12px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+        '<span style="font-size:13px;color:#666">课程价格</span>' +
+        '<span style="font-size:14px;font-weight:600;color:#1a1a2e">¥'+_payCoursePrice+'</span>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px dashed #e2e8f0">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          '<span style="font-size:13px;color:#666">🎯 积分抵扣</span>' +
+          '<span style="font-size:11px;color:#999">可用 '+_payPoints+' 积分</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:6px">' +
+          '<span style="font-size:13px;color:'+(usePoints?'#d97706':'#ccc')+';font-weight:500" id="payDeductLabel">'+(usePoints?'-¥'+discount:'不使用')+'</span>' +
+          '<label style="position:relative;display:inline-block;width:44px;height:26px;cursor:pointer">' +
+            '<input type="checkbox" style="opacity:0;width:0;height:0" onchange="updatePayUI(this.checked)"'+(usePoints?' checked':'')+'>' +
+            '<span style="position:absolute;top:0;left:0;right:0;bottom:0;background:'+(usePoints?'#07c160':'#d1d5db')+';border-radius:13px;transition:.3s"></span>' +
+            '<span style="position:absolute;top:2px;left:'+(usePoints?'20':'2')+'px;width:22px;height:22px;background:#fff;border-radius:50%;transition:.3s"></span>' +
+          '</label>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f0fdf4;border-radius:10px">' +
+      '<span style="font-size:14px;font-weight:600;color:#1a1a2e">应付金额</span>' +
+      '<span style="font-size:20px;font-weight:700;color:'+(usePoints?'#d97706':'#dc2626')+'" id="payFinal">¥'+finalPrice+'</span>' +
+    '</div>';
+}
+function doPay(){
+  var usePoints = document.querySelector('#payOverlay input').checked;
+  var discount = usePoints ? _payPoints : 0;
+  var finalPrice = _payCoursePrice - discount;
+  closePay();
+  if(usePoints){
+    _payPoints = 0;
+    showToast('✅ 支付成功！已使用积分抵扣，实际支付 ¥'+finalPrice);
+  } else {
+    showToast('✅ 支付成功！¥'+finalPrice);
+  }
 }
 </script>
 </body>
